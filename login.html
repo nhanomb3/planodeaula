@@ -190,6 +190,16 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #6c757d;
+        }
     </style>
 </head>
 <body>
@@ -202,6 +212,11 @@
             <div class="card-body">
                 <!-- Mensagens -->
                 <div id="message" class="message hidden"></div>
+                
+                <!-- Botão de teste de conexão -->
+                <button onclick="testarConexaoGAS()" class="btn btn-secondary" style="margin-bottom: 15px;">
+                    Testar Conexão com GAS
+                </button>
                 
                 <!-- Formulário de Login -->
                 <form id="loginForm">
@@ -246,6 +261,12 @@
                     <span id="toggleText">Não tem uma conta?</span>
                     <a id="toggleLink">Criar Conta</a>
                 </div>
+
+                <!-- Informações de Debug -->
+                <div id="debugInfo" class="debug-info hidden">
+                    <strong>Debug Info:</strong>
+                    <div id="debugContent"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -262,9 +283,50 @@
         const messageDiv = document.getElementById('message');
         const loginBtn = document.getElementById('loginBtn');
         const registerBtn = document.getElementById('registerBtn');
+        const debugInfo = document.getElementById('debugInfo');
+        const debugContent = document.getElementById('debugContent');
         
         // Estado atual
         let isLoginMode = true;
+        
+        // Mostrar informações de debug
+        function showDebugInfo(info) {
+            debugContent.textContent = JSON.stringify(info, null, 2);
+            debugInfo.classList.remove('hidden');
+        }
+
+        // Testar conexão com GAS
+        async function testarConexaoGAS() {
+            showMessage('Testando conexão...', 'success');
+            
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                });
+                
+                const result = await response.json();
+                showDebugInfo({
+                    url: SCRIPT_URL,
+                    status: response.status,
+                    result: result
+                });
+                
+                if (result.success) {
+                    showMessage('✅ Conexão com GAS funcionando!', 'success');
+                } else {
+                    showMessage('❌ Erro na conexão com GAS', 'error');
+                }
+            } catch (error) {
+                showDebugInfo({
+                    url: SCRIPT_URL,
+                    error: error.toString()
+                });
+                showMessage('❌ Falha na conexão: ' + error.toString(), 'error');
+            }
+        }
         
         // Alternar entre login e registro
         toggleLink.addEventListener('click', function() {
@@ -301,10 +363,12 @@
             messageDiv.className = `message ${type}`;
             messageDiv.classList.remove('hidden');
             
-            // Auto-esconder após 5 segundos
-            setTimeout(() => {
-                messageDiv.classList.add('hidden');
-            }, 5000);
+            // Auto-esconder após 5 segundos (exceto para erros de conexão)
+            if (type !== 'error' || !text.includes('conexão')) {
+                setTimeout(() => {
+                    messageDiv.classList.add('hidden');
+                }, 5000);
+            }
         }
         
         // Mostrar loading no botão
@@ -332,6 +396,36 @@
             }
         }
         
+        // Função para fazer requisições
+        async function fazerRequisicao(action, dados) {
+            const urlParams = new URLSearchParams({
+                action: action,
+                ...dados
+            });
+
+            console.log('Enviando requisição para:', SCRIPT_URL);
+            console.log('Dados:', Object.fromEntries(urlParams));
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: urlParams
+                });
+
+                console.log('Resposta recebida, status:', response.status);
+                const result = await response.json();
+                console.log('Resultado:', result);
+                
+                return result;
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                throw error;
+            }
+        }
+        
         // Login
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -347,19 +441,10 @@
             setButtonLoading(loginBtn, true);
             
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        action: 'login',
-                        email: email,
-                        senha: password
-                    })
+                const result = await fazerRequisicao('login', {
+                    email: email,
+                    senha: password
                 });
-                
-                const result = await response.json();
                 
                 if (result.success) {
                     showMessage('Login realizado com sucesso!', 'success');
@@ -372,7 +457,7 @@
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                showMessage('Erro de conexão. Tente novamente.', 'error');
+                showMessage('Erro de conexão. Tente novamente. ' + error.toString(), 'error');
             } finally {
                 setButtonLoading(loginBtn, false);
             }
@@ -402,21 +487,12 @@
             setButtonLoading(registerBtn, true);
             
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        action: 'register',
-                        nome: name,
-                        email: email,
-                        cellular: phone,
-                        senha: password
-                    })
+                const result = await fazerRequisicao('register', {
+                    nome: name,
+                    email: email,
+                    cellular: phone,
+                    senha: password
                 });
-                
-                const result = await response.json();
                 
                 if (result.success) {
                     showMessage('Conta criada com sucesso!', 'success');
@@ -430,10 +506,15 @@
                 }
             } catch (error) {
                 console.error('Erro:', error);
-                showMessage('Erro de conexão. Tente novamente.', 'error');
+                showMessage('Erro de conexão. Tente novamente. ' + error.toString(), 'error');
             } finally {
                 setButtonLoading(registerBtn, false);
             }
+        });
+
+        // Testar conexão automaticamente ao carregar a página
+        window.addEventListener('load', function() {
+            setTimeout(testarConexaoGAS, 1000);
         });
     </script>
 </body>
