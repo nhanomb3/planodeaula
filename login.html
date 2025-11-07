@@ -5,201 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Login</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            padding: 25px;
-            text-align: center;
-        }
-
-        .card-header h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        .card-header p {
-            opacity: 0.9;
-        }
-
-        .card-body {
-            padding: 25px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e5ee;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .form-control:focus {
-            border-color: #6a11cb;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
-        }
-
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            text-decoration: none;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            margin-bottom: 15px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 14px rgba(106, 17, 203, 0.3);
-        }
-
-        .btn-secondary {
-            background: #f8f9fa;
-            color: #555;
-            border: 2px solid #e1e5ee;
-        }
-
-        .btn-secondary:hover {
-            background: #e9ecef;
-        }
-
-        .form-toggle {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .form-toggle a {
-            color: #6a11cb;
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .form-toggle a:hover {
-            text-decoration: underline;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        .fade-out {
-            animation: fadeOut 0.5s ease forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-10px); }
-        }
-
-        .message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .debug-info {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 5px;
-            padding: 10px;
-            margin-top: 10px;
-            font-size: 12px;
-            color: #6c757d;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .container { width: 100%; max-width: 400px; padding: 20px; }
+        .card { background: white; border-radius: 15px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); overflow: hidden; }
+        .card-header { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); color: white; padding: 25px; text-align: center; }
+        .card-body { padding: 25px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
+        .form-control { width: 100%; padding: 12px 15px; border: 2px solid #e1e5ee; border-radius: 8px; font-size: 16px; transition: all 0.3s; }
+        .form-control:focus { border-color: #6a11cb; outline: none; box-shadow: 0 0 0 3px rgba(106,17,203,0.1); }
+        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); color: white; margin-bottom: 15px; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(106,17,203,0.3); }
+        .btn-secondary { background: #f8f9fa; color: #555; border: 2px solid #e1e5ee; margin-bottom: 10px; }
+        .form-toggle { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
+        .form-toggle a { color: #6a11cb; text-decoration: none; font-weight: 600; cursor: pointer; }
+        .hidden { display: none; }
+        .message { padding: 12px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: 500; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .debug-info { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 5px; padding: 10px; margin-top: 10px; font-size: 12px; color: #6c757d; }
     </style>
 </head>
 <body>
@@ -210,59 +36,48 @@
                 <p>Faça login ou crie uma conta</p>
             </div>
             <div class="card-body">
-                <!-- Mensagens -->
                 <div id="message" class="message hidden"></div>
                 
-                <!-- Botão de teste de conexão -->
-                <button onclick="testarConexaoGAS()" class="btn btn-secondary" style="margin-bottom: 15px;">
-                    Testar Conexão com GAS
-                </button>
+                <button onclick="testarConexaoGAS()" class="btn btn-secondary">Testar Conexão GAS</button>
+                <button onclick="listarUsuarios()" class="btn btn-secondary">Listar Usuários</button>
                 
-                <!-- Formulário de Login -->
                 <form id="loginForm">
                     <div class="form-group">
-                        <label for="loginEmail">Email ou Número de Celular</label>
-                        <input type="text" id="loginEmail" class="form-control" required>
+                        <label>Email ou Celular</label>
+                        <input type="text" id="loginEmail" class="form-control" required value="848960732">
                     </div>
                     <div class="form-group">
-                        <label for="loginPassword">Senha</label>
-                        <input type="password" id="loginPassword" class="form-control" required>
+                        <label>Senha</label>
+                        <input type="password" id="loginPassword" class="form-control" required value="123456">
                     </div>
-                    <button type="submit" class="btn btn-primary" id="loginBtn">
-                        <span>Entrar</span>
-                    </button>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
                 </form>
                 
-                <!-- Formulário de Criação de Conta -->
                 <form id="registerForm" class="hidden">
                     <div class="form-group">
-                        <label for="registerName">Nome Completo</label>
-                        <input type="text" id="registerName" class="form-control" required>
+                        <label>Nome Completo</label>
+                        <input type="text" id="registerName" class="form-control" required value="Benjamim">
                     </div>
                     <div class="form-group">
-                        <label for="registerEmail">Email</label>
-                        <input type="email" id="registerEmail" class="form-control" required>
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" class="form-control" required value="edmilsonnhanombe62@gmail.com">
                     </div>
                     <div class="form-group">
-                        <label for="registerPhone">Número de Celular</label>
-                        <input type="tel" id="registerPhone" class="form-control" required>
+                        <label>Celular</label>
+                        <input type="tel" id="registerPhone" class="form-control" required value="849976321">
                     </div>
                     <div class="form-group">
-                        <label for="registerPassword">Senha</label>
-                        <input type="password" id="registerPassword" class="form-control" required>
+                        <label>Senha</label>
+                        <input type="password" id="registerPassword" class="form-control" required value="123456">
                     </div>
-                    <button type="submit" class="btn btn-primary" id="registerBtn">
-                        <span>Criar Conta</span>
-                    </button>
+                    <button type="submit" class="btn btn-primary">Criar Conta</button>
                 </form>
                 
-                <!-- Alternar entre formulários -->
                 <div class="form-toggle">
                     <span id="toggleText">Não tem uma conta?</span>
                     <a id="toggleLink">Criar Conta</a>
                 </div>
 
-                <!-- Informações de Debug -->
                 <div id="debugInfo" class="debug-info hidden">
                     <strong>Debug Info:</strong>
                     <div id="debugContent"></div>
@@ -272,250 +87,131 @@
     </div>
 
     <script>
-        // Configuração - SEU GAS URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwy_PIcbyuBv7yDg7wPJd2jC9GEQxp1lfqSpltzfIoJwXD-_9ehs3_xBvTI5dh-r7o_g/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwy_PIcbyuOBv7yDg7wd2jC9GEQxp1lfqSpltzfIoJwXD-_9ehs3_xBvTI5dh-r7o_g/exec';
         
         // Elementos DOM
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const toggleLink = document.getElementById('toggleLink');
-        const toggleText = document.getElementById('toggleText');
-        const messageDiv = document.getElementById('message');
-        const loginBtn = document.getElementById('loginBtn');
-        const registerBtn = document.getElementById('registerBtn');
-        const debugInfo = document.getElementById('debugInfo');
-        const debugContent = document.getElementById('debugContent');
-        
-        // Estado atual
+        const elements = {
+            message: document.getElementById('message'),
+            loginForm: document.getElementById('loginForm'),
+            registerForm: document.getElementById('registerForm'),
+            toggleLink: document.getElementById('toggleLink'),
+            toggleText: document.getElementById('toggleText'),
+            debugInfo: document.getElementById('debugInfo'),
+            debugContent: document.getElementById('debugContent')
+        };
+
         let isLoginMode = true;
-        
-        // Mostrar informações de debug
-        function showDebugInfo(info) {
-            debugContent.textContent = JSON.stringify(info, null, 2);
-            debugInfo.classList.remove('hidden');
+
+        // Funções de utilidade
+        function showMessage(text, type) {
+            elements.message.textContent = text;
+            elements.message.className = `message ${type}`;
+            elements.message.classList.remove('hidden');
         }
 
-        // Testar conexão com GAS
+        function showDebugInfo(info) {
+            elements.debugContent.textContent = JSON.stringify(info, null, 2);
+            elements.debugInfo.classList.remove('hidden');
+        }
+
+        // Funções de teste
         async function testarConexaoGAS() {
             showMessage('Testando conexão...', 'success');
-            
             try {
-                const response = await fetch(SCRIPT_URL + '?action=test', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    }
-                });
-                
+                const response = await fetch(SCRIPT_URL + '?action=test', { method: 'POST' });
                 const result = await response.json();
-                showDebugInfo({
-                    url: SCRIPT_URL,
-                    status: response.status,
-                    result: result
-                });
-                
-                if (result.success) {
-                    showMessage('✅ Conexão com GAS funcionando!', 'success');
-                } else {
-                    showMessage('❌ Erro na conexão com GAS', 'error');
-                }
+                showDebugInfo({ url: SCRIPT_URL, status: response.status, result });
+                showMessage(result.success ? '✅ Conexão OK!' : '❌ Erro no GAS', result.success ? 'success' : 'error');
             } catch (error) {
-                showDebugInfo({
-                    url: SCRIPT_URL,
-                    error: error.toString()
-                });
-                showMessage('❌ Falha na conexão: ' + error.toString(), 'error');
+                showDebugInfo({ url: SCRIPT_URL, error: error.toString() });
+                showMessage('❌ Falha na conexão', 'error');
             }
         }
-        
-        // Alternar entre login e registro
-        toggleLink.addEventListener('click', function() {
-            if (isLoginMode) {
-                // Mudar para modo de registro
-                loginForm.classList.add('fade-out');
-                setTimeout(() => {
-                    loginForm.classList.add('hidden');
-                    loginForm.classList.remove('fade-out');
-                    registerForm.classList.remove('hidden');
-                    registerForm.classList.add('fade-in');
-                    toggleText.textContent = 'Já tem uma conta?';
-                    toggleLink.textContent = 'Fazer Login';
-                    isLoginMode = false;
-                }, 300);
-            } else {
-                // Mudar para modo de login
-                registerForm.classList.add('fade-out');
-                setTimeout(() => {
-                    registerForm.classList.add('hidden');
-                    registerForm.classList.remove('fade-out');
-                    loginForm.classList.remove('hidden');
-                    loginForm.classList.add('fade-in');
-                    toggleText.textContent = 'Não tem uma conta?';
-                    toggleLink.textContent = 'Criar Conta';
-                    isLoginMode = true;
-                }, 300);
-            }
-        });
-        
-        // Mostrar mensagem
-        function showMessage(text, type) {
-            messageDiv.textContent = text;
-            messageDiv.className = `message ${type}`;
-            messageDiv.classList.remove('hidden');
-            
-            // Auto-esconder após 5 segundos (exceto para erros de conexão)
-            if (type !== 'error' || !text.includes('conexão')) {
-                setTimeout(() => {
-                    messageDiv.classList.add('hidden');
-                }, 5000);
+
+        async function listarUsuarios() {
+            showMessage('Buscando usuários...', 'success');
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=listUsers', { method: 'POST' });
+                const result = await response.json();
+                showDebugInfo(result);
+                showMessage(result.success ? `✅ ${result.total} usuários encontrados` : '❌ Erro ao listar', result.success ? 'success' : 'error');
+            } catch (error) {
+                showDebugInfo({ error: error.toString() });
+                showMessage('❌ Erro ao listar usuários', 'error');
             }
         }
-        
-        // Mostrar loading no botão
-        function setButtonLoading(button, isLoading) {
-            const span = button.querySelector('span');
-            if (isLoading) {
-                button.disabled = true;
-                span.textContent = '';
-                const loading = document.createElement('div');
-                loading.className = 'loading';
-                span.appendChild(loading);
-                
-                if (button.id === 'loginBtn') {
-                    span.appendChild(document.createTextNode(' Entrando...'));
-                } else {
-                    span.appendChild(document.createTextNode(' Criando conta...'));
-                }
-            } else {
-                button.disabled = false;
-                if (button.id === 'loginBtn') {
-                    span.textContent = 'Entrar';
-                } else {
-                    span.textContent = 'Criar Conta';
-                }
-            }
-        }
-        
-        // Função para fazer requisições
+
+        // Função principal de requisição
         async function fazerRequisicao(action, dados) {
-            const urlParams = new URLSearchParams({
-                action: action,
-                ...dados
-            });
-
-            console.log('Enviando requisição para:', SCRIPT_URL);
-            console.log('Dados:', Object.fromEntries(urlParams));
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: urlParams
-                });
-
-                console.log('Resposta recebida, status:', response.status);
-                const result = await response.json();
-                console.log('Resultado:', result);
-                
-                return result;
-            } catch (error) {
-                console.error('Erro na requisição:', error);
-                throw error;
-            }
-        }
-        
-        // Login
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+            const urlParams = new URLSearchParams({ action, ...dados });
+            console.log(`Enviando ${action}:`, Object.fromEntries(urlParams));
             
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: urlParams
+            });
+            
+            return await response.json();
+        }
+
+        // Event Listeners
+        elements.toggleLink.addEventListener('click', function() {
+            isLoginMode = !isLoginMode;
+            elements.loginForm.classList.toggle('hidden', !isLoginMode);
+            elements.registerForm.classList.toggle('hidden', isLoginMode);
+            elements.toggleText.textContent = isLoginMode ? 'Não tem uma conta?' : 'Já tem uma conta?';
+            elements.toggleLink.textContent = isLoginMode ? 'Criar Conta' : 'Fazer Login';
+        });
+
+        elements.loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
             
             if (!email || !password) {
-                showMessage('Por favor, preencha todos os campos.', 'error');
+                showMessage('Preencha todos os campos', 'error');
                 return;
             }
-            
-            setButtonLoading(loginBtn, true);
-            
+
             try {
-                const result = await fazerRequisicao('login', {
-                    email: email,
-                    senha: password
-                });
-                
-                if (result.success) {
-                    showMessage('Login realizado com sucesso!', 'success');
-                    // Redirecionar após sucesso
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 1500);
-                } else {
-                    showMessage('Falha no login: ' + result.message, 'error');
-                }
+                const result = await fazerRequisicao('login', { email, senha: password });
+                showMessage(result.message, result.success ? 'success' : 'error');
+                showDebugInfo(result);
             } catch (error) {
-                console.error('Erro:', error);
-                showMessage('Erro de conexão. Tente novamente. ' + error.toString(), 'error');
-            } finally {
-                setButtonLoading(loginBtn, false);
-            }
-        });
-        
-        // Registro
-        registerForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const phone = document.getElementById('registerPhone').value;
-            const password = document.getElementById('registerPassword').value;
-            
-            if (!name || !email || !phone || !password) {
-                showMessage('Por favor, preencha todos os campos.', 'error');
-                return;
-            }
-            
-            // Validação básica de email
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showMessage('Por favor, insira um email válido.', 'error');
-                return;
-            }
-            
-            setButtonLoading(registerBtn, true);
-            
-            try {
-                const result = await fazerRequisicao('register', {
-                    nome: name,
-                    email: email,
-                    cellular: phone,
-                    senha: password
-                });
-                
-                if (result.success) {
-                    showMessage('Conta criada com sucesso!', 'success');
-                    // Voltar para o login após sucesso
-                    setTimeout(() => {
-                        toggleLink.click();
-                        registerForm.reset();
-                    }, 2000);
-                } else {
-                    showMessage('Erro ao criar conta: ' + result.message, 'error');
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                showMessage('Erro de conexão. Tente novamente. ' + error.toString(), 'error');
-            } finally {
-                setButtonLoading(registerBtn, false);
+                showMessage('Erro de conexão: ' + error, 'error');
             }
         });
 
-        // Testar conexão automaticamente ao carregar a página
-        window.addEventListener('load', function() {
-            setTimeout(testarConexaoGAS, 1000);
+        elements.registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = {
+                nome: document.getElementById('registerName').value,
+                email: document.getElementById('registerEmail').value,
+                cellular: document.getElementById('registerPhone').value,
+                senha: document.getElementById('registerPassword').value
+            };
+
+            if (Object.values(data).some(val => !val)) {
+                showMessage('Preencha todos os campos', 'error');
+                return;
+            }
+
+            try {
+                const result = await fazerRequisicao('register', data);
+                showMessage(result.message, result.success ? 'success' : 'error');
+                showDebugInfo(result);
+                
+                if (result.success) {
+                    setTimeout(() => elements.toggleLink.click(), 2000);
+                }
+            } catch (error) {
+                showMessage('Erro de conexão: ' + error, 'error');
+            }
         });
+
+        // Teste automático ao carregar
+        window.addEventListener('load', () => setTimeout(testarConexaoGAS, 500));
     </script>
 </body>
 </html>
