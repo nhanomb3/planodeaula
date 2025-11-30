@@ -2,22 +2,21 @@
 <html lang="pt">
 <head>
   <!-- PWA Meta Tags -->
-<meta name="theme-color" content="#2196f3">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Plano de Aula">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#2196f3">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Plano de Aula">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-<!-- Manifest -->
-<link rel="manifest" href="/manifest.json">
+  <!-- Manifest (CORRIGIDO - caminho relativo) -->
+  <link rel="manifest" href="manifest.json">
 
-<!-- Icons -->
-<link rel="icon" type="image/png" href="/icon-192x192.png">
-<link rel="apple-touch-icon" href="/icon-192x192.png">
+  <!-- Icons (CORRIGIDO - caminhos relativos) -->
+  <link rel="icon" type="image/png" href="icon-192x192.png">
+  <link rel="apple-touch-icon" href="icon-192x192.png">
   
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Plano de Aula Moçambicano</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
@@ -198,7 +197,7 @@
     ul.historico-lista li { padding: 8px 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
     ul.historico-lista li i { color: var(--cor-sucesso); }
 
-    /* === Roda da Sorte Corrigida (APENAS ESTA PARTE FOI ALTERADA) === */
+    /* === Roda da Sorte Corrigida === */
     .roda-container {
       text-align: center;
       margin: 20px 0;
@@ -222,10 +221,10 @@
       transform-origin: bottom right;
     }
 
-    .setor-1 { background: #2ecc71; transform: rotate(0deg); } /* Verde: Boa Sorte */
-    .setor-2 { background: #3498db; transform: rotate(90deg); } /* Azul: Mensal */
-    .setor-3 { background: #f39c12; transform: rotate(180deg); } /* Laranja: Diário */
-    .setor-4 { background: #9b59b6; transform: rotate(270deg); } /* Roxo: Semanal */
+    .setor-1 { background: #2ecc71; transform: rotate(0deg); }
+    .setor-2 { background: #3498db; transform: rotate(90deg); }
+    .setor-3 { background: #f39c12; transform: rotate(180deg); }
+    .setor-4 { background: #9b59b6; transform: rotate(270deg); }
 
     .rotulo {
       position: absolute;
@@ -327,23 +326,40 @@
         font-size: 0.7rem;
       }
     }
+
+    /* Instalação PWA */
+    .pwa-install-prompt {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--cor-primaria);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      box-shadow: var(--sombra);
+      z-index: 10000;
+      display: none;
+    }
+    .pwa-install-prompt button {
+      background: white;
+      color: var(--cor-primaria);
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-left: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
   </style>
-<!-- Service Worker Registration -->
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(function(registration) {
-          console.log('Service Worker registrado com sucesso:', registration);
-        })
-        .catch(function(error) {
-          console.log('Falha no registro do Service Worker:', error);
-        });
-    });
-  }
-</script>
 </head>
 <body>
+
+  <!-- Prompt de Instalação PWA -->
+  <div class="pwa-install-prompt" id="pwaInstallPrompt">
+    <span>Instalar App Plano de Aula?</span>
+    <button onclick="installPWA()">Instalar</button>
+    <button onclick="dismissPWA()" style="background: transparent; color: white; margin-left: 5px;">×</button>
+  </div>
 
   <nav class="navbar">
     <h1>Plano de Aula MZ</h1>
@@ -373,10 +389,10 @@
         <span style="position:absolute; top:2px; left:2px; width:16px; height:16px; background:white; border-radius:50%; transition:0.3s;"></span>
       </label>
     </div>
-    <a href="#" class="sidebar-item" onclick="alert('🛡️ Termos e Políticas de Uso (em elaboração).')">
+    <a href="termos.html" class="sidebar-item">
       <i class="fas fa-shield-alt"></i> Termos e Políticas
     </a>
-    <a href="#" class="sidebar-item" onclick="alert('ℹ️ Aplicação para criação de Planos de Aula Moçambicanos.\nDesenvolvido por Edmilson Bartolomeu Nhanombe.')">
+    <a href="sobre.html" class="sidebar-item">
       <i class="fas fa-info-circle"></i> Sobre
     </a>
     <div class="sidebar-footer">
@@ -388,8 +404,8 @@
 
   <div class="botoes-principais">
     <button class="btn btn-vip" onclick="window.location.href='planovip.html'">
-  <i class="fas fa-crown"></i> Plano VIP
-</button>
+      <i class="fas fa-crown"></i> Plano VIP
+    </button>
     <button class="btn btn-gratis" onclick="window.location.href='planogratis.html'">
       <i class="fas fa-ad"></i> Plano Gratuito
     </button>
@@ -497,10 +513,10 @@
 
       <div class="roda-container">
         <div class="roda">
-          <div class="setor setor-1"></div> <!-- Verde: Boa Sorte -->
-          <div class="setor setor-2"></div> <!-- Azul: Mensal -->
-          <div class="setor setor-3"></div> <!-- Laranja: Diário -->
-          <div class="setor setor-4"></div> <!-- Roxo: Semanal -->
+          <div class="setor setor-1"></div>
+          <div class="setor setor-2"></div>
+          <div class="setor setor-3"></div>
+          <div class="setor setor-4"></div>
 
           <div class="rotulo rotulo-1">Boa Sorte</div>
           <div class="rotulo rotulo-2">Mensal</div>
@@ -537,7 +553,68 @@
   </div>
 
   <script>
-    // Estado do usuário (mock)
+    // ========== PWA FUNCTIONALITY ==========
+    let deferredPrompt;
+    const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
+
+    // Service Worker Registration (CORRIGIDO)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(function(registration) {
+            console.log('Service Worker registrado com sucesso:', registration);
+          })
+          .catch(function(error) {
+            console.log('Falha no registro do Service Worker:', error);
+          });
+      });
+    }
+
+    // Before Install Prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Mostrar prompt personalizado após 5 segundos
+      setTimeout(() => {
+        if (deferredPrompt && !isAppInstalled()) {
+          pwaInstallPrompt.style.display = 'block';
+        }
+      }, 5000);
+    });
+
+    // App Installed
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      pwaInstallPrompt.style.display = 'none';
+      console.log('PWA instalado com sucesso');
+    });
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('Usuário aceitou a instalação');
+          }
+          deferredPrompt = null;
+          pwaInstallPrompt.style.display = 'none';
+        });
+      }
+    }
+
+    function dismissPWA() {
+      pwaInstallPrompt.style.display = 'none';
+      localStorage.setItem('pwaPromptDismissed', 'true');
+    }
+
+    function isAppInstalled() {
+      return window.matchMedia('(display-mode: standalone)').matches || 
+             window.navigator.standalone ||
+             document.referrer.includes('android-app://');
+    }
+
+    // ========== EXISTING APP FUNCTIONALITY ==========
     const USUARIO_ATUAL = 'prof_edmilson';
 
     function mostrarContatoAdmin() { document.getElementById('modalAdmin').style.display = 'flex'; }
@@ -551,7 +628,7 @@
     function mostrarEstatisticas() { document.getElementById('modalEstatisticas').style.display = 'flex'; }
     function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    // ========== Dark Mode ==========
+    // Dark Mode
     document.getElementById('toggleDarkMode').addEventListener('change', function() {
       document.body.classList.toggle('dark', this.checked);
       localStorage.setItem('temaEscuro', this.checked);
@@ -561,7 +638,7 @@
       document.getElementById('toggleDarkMode').checked = true;
     }
 
-    // ========== Menu Lateral ==========
+    // Menu Lateral
     document.getElementById('menuToggle').addEventListener('click', () => {
       document.getElementById('sidebar').classList.add('active');
       document.getElementById('overlay').classList.add('active');
@@ -571,7 +648,7 @@
       document.getElementById('overlay').classList.remove('active');
     });
 
-    // ========== Copiar número ==========
+    // Copiar número
     function copiarNumero(numero) {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(numero).then(() => {
@@ -591,7 +668,7 @@
       alert(`✅ ${numero} copiado!`);
     }
 
-    // ========== Histórico por usuário ==========
+    // Histórico
     function baixarPDF(nome) {
       const blob = new Blob(['Plano de Aula Moçambicano — ', nome, '\nGerado em: ', new Date().toLocaleString('pt-MZ')], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
@@ -609,7 +686,7 @@
       alert(`📥 ${nome} baixado e salvo no seu histórico.`);
     }
 
-    // ========== Abano da Sorte ==========
+    // Abano da Sorte
     function atualizarTentativas() {
       const hoje = new Date().toDateString();
       const dados = JSON.parse(localStorage.getItem(`sorte_${USUARIO_ATUAL}`) || '{}');
@@ -637,7 +714,7 @@
 
       setTimeout(() => {
         const angulo = giros % 360;
-        const setor = Math.floor(angulo / 90); // 0=Boa Sorte, 1=Mensal, 2=Diário, 3=Semanal
+        const setor = Math.floor(angulo / 90);
 
         let resultado, mensagem, abrirWhatsApp = false;
 
@@ -669,7 +746,7 @@
       }, 2100);
     }
 
-    // ========== Atalho de teclado ==========
+    // Atalho de teclado
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         ['modalAdmin','modalConta','modalDoacoes','modalHistorico','modalSorte','modalEstatisticas']
@@ -677,8 +754,14 @@
       }
     });
 
-    // ========== Inicializar ==========
+    // Inicializar
     atualizarTentativas();
+
+    // Verificar se é PWA instalado
+    if (isAppInstalled()) {
+      console.log('App executando como PWA instalado');
+      document.body.classList.add('pwa-installed');
+    }
   </script>
 </body>
 </html>
