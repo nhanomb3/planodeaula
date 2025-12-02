@@ -6,44 +6,46 @@ const urlsToCache = [
   '/termos.html',
 ];
 
-// Instalação do Service Worker
-self.addEventListener('install', function(event) {
+// Instalação
+self.addEventListener('install', event => {
+  self.skipWaiting(); // Ativa a nova versão instantaneamente
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(function(cache) {
-        console.log('Cache aberto');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('Cache aberto');
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
 // Interceptação de requisições
-self.addEventListener('fetch', function(event) {
+self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(function(response) {
-        // Retorna do cache ou faz a requisição
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 });
 
 // Ativação e limpeza de caches antigos
-self.addEventListener('activate', function(event) {
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(function(cacheNames) {
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map(function(cacheName) {
+        cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Deletando cache antigo:', cacheName);
+            console.log('Removendo cache antigo:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     })
   );
+  clients.claim(); // Faz o SW novo assumir imediatamente
+});
+
+// Ouve comando para ativar o SW imediatamente
+self.addEventListener('message', event => {
+  if (event.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
