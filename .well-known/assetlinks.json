@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "io.github.nhanomb3.twa",
-        "sha256_cert_fingerprints": ["EB:F3:71:93:77:68:DF:01:5C:1C:FE:ED:CF:62:09:32:FE:60:8C:A2:47:D0:C3:0F:91:F9:BC:97:0C:BC:7B:A1"]
-      }
-    }]
