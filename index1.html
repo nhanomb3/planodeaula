@@ -551,96 +551,87 @@
       </button>
     </div>
   </div>
-
-  <script>
+<script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js').then(reg => {
 
-    reg.onupdatefound = () => {
-      const newSW = reg.installing;
+  // Registrar o Service Worker
+  navigator.serviceWorker.register('/service-worker.js').then(registration => {
 
-      newSW.onstatechange = () => {
-        if (newSW.state === 'installed') {
+    // Detecta quando há um novo Service Worker
+    registration.onupdatefound = () => {
+      const newWorker = registration.installing;
+
+      newWorker.onstatechange = () => {
+        if (newWorker.state === 'installed') {
+
+          // Se já existe um SW ativo, então há nova versão
           if (navigator.serviceWorker.controller) {
-            // Nova versão detectada
-            console.log("Nova versão disponível. Atualizando...");
+            console.log("Nova versão detectada. Atualizando...");
 
-            // Força o novo SW a ativar
-            reg.waiting?.postMessage('SKIP_WAITING');
+            // Envia comando para ativar imediatamente
+            registration.waiting?.postMessage('SKIP_WAITING');
           }
         }
       };
     };
+
+  }).catch(err => {
+    console.log('Erro ao registrar Service Worker:', err);
   });
 
-  // Recarregar a página quando o SW novo se tornar ativo
+  // Quando o novo SW assumir o controle → recarrega a página
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     window.location.reload();
   });
 }
-              </script>
+</script>
 
   <script>
-    // ========== PWA FUNCTIONALITY ==========
-    let deferredPrompt;
-    const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
+let deferredPrompt;
+const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
 
-    // Service Worker Registration (CORRIGIDO)
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('service-worker.js')
-          .then(function(registration) {
-            console.log('Service Worker registrado com sucesso:', registration);
-          })
-          .catch(function(error) {
-            console.log('Falha no registro do Service Worker:', error);
-          });
-      });
+// Detecta o evento para instalar PWA
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Mostra a caixa após 5 segundos
+  setTimeout(() => {
+    if (deferredPrompt && !isAppInstalled()) {
+      pwaInstallPrompt.style.display = 'block';
     }
+  }, 5000);
+});
 
-    // Before Install Prompt
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      
-      // Mostrar prompt personalizado após 5 segundos
-      setTimeout(() => {
-        if (deferredPrompt && !isAppInstalled()) {
-          pwaInstallPrompt.style.display = 'block';
-        }
-      }, 5000);
-    });
+// Após instalação
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  pwaInstallPrompt.style.display = 'none';
+  console.log('PWA instalado com sucesso');
+});
 
-    // App Installed
-    window.addEventListener('appinstalled', () => {
+// Instalar PWA manualmente
+function installPWA() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
       deferredPrompt = null;
       pwaInstallPrompt.style.display = 'none';
-      console.log('PWA instalado com sucesso');
     });
+  }
+}
 
-    function installPWA() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('Usuário aceitou a instalação');
-          }
-          deferredPrompt = null;
-          pwaInstallPrompt.style.display = 'none';
-        });
-      }
-    }
+// Fechar caixa
+function dismissPWA() {
+  pwaInstallPrompt.style.display = 'none';
+}
 
-    function dismissPWA() {
-      pwaInstallPrompt.style.display = 'none';
-      localStorage.setItem('pwaPromptDismissed', 'true');
-    }
-
-    function isAppInstalled() {
-      return window.matchMedia('(display-mode: standalone)').matches || 
-             window.navigator.standalone ||
-             document.referrer.includes('android-app://');
-    }
+// Verifica se app já está instalada
+function isAppInstalled() {
+  return window.matchMedia('(display-mode: standalone)').matches || 
+         navigator.standalone ||
+         document.referrer.includes('android-app://');
+}
 
     // ========== EXISTING APP FUNCTIONALITY ==========
     const USUARIO_ATUAL = 'prof_edmilson';
