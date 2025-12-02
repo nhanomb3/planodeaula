@@ -1,0 +1,4 @@
+# _config.yml
+include: [".well-known"]
+exclude: []
+safe: false
