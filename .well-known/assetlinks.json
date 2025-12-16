@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "io.github.nhanomb3.twa",
-        "sha256_cert_fingerprints": ["69:64:D3:3A:B7:9E:D8:6B:D3:17:9D:2E:34:9C:48:77:13:C4:9A:CF:8B:A1:19:34:C0:7F:B9:DD:F5:28:80:0B"]
+        "sha256_cert_fingerprints": ["81:E6:4E:B4:01:9E:64:CE:EB:AC:A9:82:1F:20:BD:71:B5:52:8F:E8:51:F6:9C:55:66:C7:46:89:AE:72:E1:F8"]
       }
     }]
