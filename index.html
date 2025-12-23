@@ -9,16 +9,14 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-  <!-- Manifest (CORRIGIDO - caminho relativo) -->
+  <!-- Manifest -->
   <link rel="manifest" href="manifest.json">
-
-  <!-- Icons (CORRIGIDO - caminhos relativos) -->
   <link rel="icon" type="image/png" href="icon-192x192.png">
   <link rel="apple-touch-icon" href="icon-192x192.png">
   
   <meta charset="UTF-8" />
   <title>Plano de Aula Moçambicano</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css " />
   <style>
     :root {
       --cor-primaria: #2b5dab;
@@ -117,7 +115,7 @@
       max-width: 900px;
       margin: 20px auto;
     }
-    .btn {
+    .btn, .btn-sorte-link {
       padding: 16px;
       border: none;
       border-radius: 12px;
@@ -132,15 +130,16 @@
       gap: 8px;
       box-shadow: var(--sombra);
       transition: transform 0.2s;
+      text-decoration: none;
     }
-    .btn:hover { transform: translateY(-3px); }
+    .btn:hover, .btn-sorte-link:hover { transform: translateY(-3px); }
     .btn-vip      { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); }
     .btn-gratis   { background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%); }
     .btn-caderno  { background: #ff9f43; }
     .btn-quinzenal{ background: #3498db; }
     .btn-doacoes  { background: #e74c3c; }
     .btn-historico{ background: #2ecc71; }
-    .btn-sorte    { background: #9b59b6; }
+    .btn-sorte-link{ background: #9b59b6; display: flex; align-items: center; justify-content: center; }
 
     .modal {
       display: none;
@@ -197,102 +196,6 @@
     ul.historico-lista li { padding: 8px 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
     ul.historico-lista li i { color: var(--cor-sucesso); }
 
-    /* === Roda da Sorte Corrigida === */
-    .roda-container {
-      text-align: center;
-      margin: 20px 0;
-      position: relative;
-    }
-
-    .roda {
-      width: 280px;
-      height: 280px;
-      margin: 0 auto;
-      position: relative;
-      border-radius: 50%;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-    }
-
-    .setor {
-      position: absolute;
-      width: 50%;
-      height: 50%;
-      transform-origin: bottom right;
-    }
-
-    .setor-1 { background: #2ecc71; transform: rotate(0deg); }
-    .setor-2 { background: #3498db; transform: rotate(90deg); }
-    .setor-3 { background: #f39c12; transform: rotate(180deg); }
-    .setor-4 { background: #9b59b6; transform: rotate(270deg); }
-
-    .rotulo {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      font-size: 0.8rem;
-      font-weight: bold;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
-      pointer-events: none;
-      user-select: none;
-      text-align: center;
-    }
-
-    .rotulo-1 {
-      transform: translate(-50%, -50%) rotate(45deg) translateY(-70px);
-    }
-    .rotulo-2 {
-      transform: translate(-50%, -50%) rotate(135deg) translateY(-70px);
-    }
-    .rotulo-3 {
-      transform: translate(-50%, -50%) rotate(225deg) translateY(-70px);
-    }
-    .rotulo-4 {
-      transform: translate(-50%, -50%) rotate(315deg) translateY(-70px);
-    }
-
-    .ponteiro {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 20px;
-      height: 120px;
-      background: #e74c3c;
-      transform: translate(-50%, -100%) rotate(0deg);
-      transform-origin: bottom;
-      border-radius: 4px 4px 0 0;
-      z-index: 10;
-      transition: transform 2s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-    .centro {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 40px;
-      height: 40px;
-      background: white;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: var(--cor-primaria);
-      font-size: 1.2rem;
-    }
-
-    .btn-girar {
-      margin-top: 20px;
-      background: #27ae60;
-      padding: 12px 24px;
-      font-size: 1rem;
-      width: 60%;
-    }
-
     /* Estatísticas */
     .stats {
       background: #f8f9fa;
@@ -316,16 +219,6 @@
     body.dark .sidebar-item,
     body.dark .stats { color: #e0e0e0; background: #2d2d2d; }
     body.dark ul.historico-lista li { border-color: #444; }
-
-    @media (max-width: 480px) {
-      .roda {
-        width: 220px;
-        height: 220px;
-      }
-      .rotulo {
-        font-size: 0.7rem;
-      }
-    }
 
     /* Instalação PWA */
     .pwa-install-prompt {
@@ -412,7 +305,7 @@
     <button class="btn btn-caderno" onclick="mostrarOpcoesConta()">
       <i class="fas fa-book"></i> Caderno
     </button>
-    <button class="btn btn-quinzenal" onclick="window.open('https://profbenjanuario-4d854.web.app/plano_quinzenal.html', '_blank')">
+    <button class="btn btn-quinzenal" onclick="window.open('https://profbenjanuario-4d854.web.app/plano_quinzenal.html  ', '_blank')">
       <i class="fas fa-calendar-alt"></i> Plano Quinzenal
     </button>
     <button class="btn btn-doacoes" onclick="mostrarDoacoes()">
@@ -421,9 +314,10 @@
     <button class="btn btn-historico" onclick="mostrarHistorico()">
       <i class="fas fa-history"></i> Histórico
     </button>
-    <button class="btn btn-sorte" onclick="mostrarAbanoSorte()">
+    <!-- ✅ Abano da Sorte agora é link para página externa -->
+    <a href="abano.html" class="btn-sorte-link">
       <i class="fas fa-dice"></i> Abano da Sorte
-    </button>
+    </a>
   </div>
 
   <!-- Modal: Contato Admin -->
@@ -434,7 +328,7 @@
       <a href="tel:+258876393961" class="ligar">
         <i class="fas fa-phone"></i> Ligar (87 639 3961)
       </a>
-      <a href="https://wa.me/258876393961" target="_blank" class="whatsapp">
+      <a href="https://wa.me/258876393961 " target="_blank" class="whatsapp">
         <i class="fab fa-whatsapp"></i> WhatsApp
       </a>
       <a href="mailto:edmilsonnhanombe62@gmail.com" class="email">
@@ -488,50 +382,19 @@
     </div>
   </div>
 
-  <!-- Modal: Histórico -->
+  <!-- Modal: Histórico (SEM roda da sorte aqui) -->
   <div class="modal" id="modalHistorico">
     <div class="modal-content">
       <button class="close-modal" onclick="fecharModal('modalHistorico')">&times;</button>
-      <h3>📁 Seu Histórico — Prof. Edmilson</h3>
+      <h3>📁 Seu Histórico</h3>
       <select id="mesHistorico">
+        <option>Dezembro 2025</option>
         <option>Novembro 2025</option>
         <option>Outubro 2025</option>
       </select>
-      <ul class="historico-lista">
-        <li><i class="fas fa-file-pdf"></i> Plano_8a_Mat_15-11.pdf <a href="#" onclick="baixarPDF('Plano_8a_Mat_15-11.pdf'); return false;" class="copiar" style="background:#3498db; width:auto; padding:4px 8px;">Baixar</a></li>
-        <li><i class="fas fa-file-pdf"></i> Plano_8a_Port_22-11.pdf <a href="#" onclick="baixarPDF('Plano_8a_Port_22-11.pdf'); return false;" class="copiar" style="background:#3498db; width:auto; padding:4px 8px;">Baixar</a></li>
+      <ul class="historico-lista" id="listaHistorico">
+        <!-- preenchido dinamicamente -->
       </ul>
-    </div>
-  </div>
-
-  <!-- Modal: Abano da Sorte -->
-  <div class="modal" id="modalSorte">
-    <div class="modal-content">
-      <button class="close-modal" onclick="fecharModal('modalSorte')">&times;</button>
-      <h3>🎲 Abano da Sorte</h3>
-      <p id="mensagemTentativas" style="color:#e67e22; font-weight:bold;"></p>
-
-      <div class="roda-container">
-        <div class="roda">
-          <div class="setor setor-1"></div>
-          <div class="setor setor-2"></div>
-          <div class="setor setor-3"></div>
-          <div class="setor setor-4"></div>
-
-          <div class="rotulo rotulo-1">Boa Sorte</div>
-          <div class="rotulo rotulo-2">Mensal</div>
-          <div class="rotulo rotulo-3">Diário</div>
-          <div class="rotulo rotulo-4">Semanal</div>
-
-          <div class="ponteiro" id="ponteiro"></div>
-          <div class="centro">?</div>
-        </div>
-      </div>
-
-      <button class="btn-girar" onclick="girarRoda()">
-        <i class="fas fa-sync-alt"></i> Girar Agora!
-      </button>
-      <small id="mensagemSorte" style="display:block; margin-top:10px; text-align:center; min-height:24px;"></small>
     </div>
   </div>
 
@@ -544,108 +407,94 @@
         <p><strong>👥 Total de acessos:</strong> 2 847</p>
         <p><strong>📝 Planos gerados:</strong> 1 219</p>
         <p><strong>📥 PDFs baixados:</strong> 842</p>
-        <p><small>Dados atualizados em: 29/11/2025</small></p>
+        <p><small>Dados atualizados em: 23/12/2025</small></p>
       </div>
       <button class="ligar" onclick="fecharModal('modalEstatisticas')">
         Fechar
       </button>
     </div>
   </div>
-<script>
-if ('serviceWorker' in navigator) {
-
-  // Registrar o Service Worker
-  navigator.serviceWorker.register('/service-worker.js').then(registration => {
-
-    // Detecta quando há um novo Service Worker
-    registration.onupdatefound = () => {
-      const newWorker = registration.installing;
-
-      newWorker.onstatechange = () => {
-        if (newWorker.state === 'installed') {
-
-          // Se já existe um SW ativo, então há nova versão
-          if (navigator.serviceWorker.controller) {
-            console.log("Nova versão detectada. Atualizando...");
-
-            // Envia comando para ativar imediatamente
-            registration.waiting?.postMessage('SKIP_WAITING');
-          }
-        }
-      };
-    };
-
-  }).catch(err => {
-    console.log('Erro ao registrar Service Worker:', err);
-  });
-
-  // Quando o novo SW assumir o controle → recarrega a página
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    window.location.reload();
-  });
-}
-</script>
 
   <script>
-let deferredPrompt;
-const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
-
-// Detecta o evento para instalar PWA
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-
-  // Mostra a caixa após 5 segundos
-  setTimeout(() => {
-    if (deferredPrompt && !isAppInstalled()) {
-      pwaInstallPrompt.style.display = 'block';
+    // ✅ Geração de ID anônimo e persistente por usuário
+    function getUsuarioID() {
+      let id = localStorage.getItem('usuario_id');
+      if (!id) {
+        // Gera UUID v4 simplificado com crypto (seguro e anônimo)
+        id = ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+          (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+        );
+        localStorage.setItem('usuario_id', id);
+      }
+      return id;
     }
-  }, 5000);
-});
+    const USUARIO_ATUAL = getUsuarioID(); // ✅ único por dispositivo
 
-// Após instalação
-window.addEventListener('appinstalled', () => {
-  deferredPrompt = null;
-  pwaInstallPrompt.style.display = 'none';
-  console.log('PWA instalado com sucesso');
-});
-
-// Instalar PWA manualmente
-function installPWA() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
-      deferredPrompt = null;
-      pwaInstallPrompt.style.display = 'none';
-    });
-  }
-}
-
-// Fechar caixa
-function dismissPWA() {
-  pwaInstallPrompt.style.display = 'none';
-}
-
-// Verifica se app já está instalada
-function isAppInstalled() {
-  return window.matchMedia('(display-mode: standalone)').matches || 
-         navigator.standalone ||
-         document.referrer.includes('android-app://');
-}
-
-    // ========== EXISTING APP FUNCTIONALITY ==========
-    const USUARIO_ATUAL = 'prof_edmilson';
-
+    // ========== FUNCIONALIDADES EXISTENTES (adaptadas para USUARIO_ATUAL dinâmico) ==========
     function mostrarContatoAdmin() { document.getElementById('modalAdmin').style.display = 'flex'; }
     function mostrarOpcoesConta() { document.getElementById('modalConta').style.display = 'flex'; }
     function mostrarDoacoes() { document.getElementById('modalDoacoes').style.display = 'flex'; }
-    function mostrarHistorico() { document.getElementById('modalHistorico').style.display = 'flex'; }
-    function mostrarAbanoSorte() { 
-      atualizarTentativas();
-      document.getElementById('modalSorte').style.display = 'flex'; 
-    }
     function mostrarEstatisticas() { document.getElementById('modalEstatisticas').style.display = 'flex'; }
     function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    // Histórico: carrega ao abrir
+    function mostrarHistorico() {
+      const modal = document.getElementById('modalHistorico');
+      modal.style.display = 'flex';
+      carregarHistorico();
+    }
+
+    function carregarHistorico() {
+      const historico = JSON.parse(localStorage.getItem(`historico_${USUARIO_ATUAL}`) || '[]');
+      const lista = document.getElementById('listaHistorico');
+      if (historico.length === 0) {
+        lista.innerHTML = '<li style="text-align:center; color:#888;">Nenhum plano gerado ainda.</li>';
+        return;
+      }
+      lista.innerHTML = historico.map((item, i) => {
+        const data = new Date(item.data).toLocaleDateString('pt-MZ');
+        return `
+          <li>
+            <i class="fas fa-file-pdf"></i> ${item.nome}
+            <a href="#" onclick="baixarPDF('${item.nome}', ${i}); return false;" class="copiar" style="background:#3498db; width:auto; padding:4px 8px;">Baixar</a>
+            <small style="color:#888;">${data}</small>
+          </li>
+        `;
+      }).join('');
+    }
+
+    // Baixar PDF e registrar no histórico individual
+    function baixarPDF(nome, index) {
+      const historico = JSON.parse(localStorage.getItem(`historico_${USUARIO_ATUAL}`) || '[]');
+      const item = historico[index];
+      if (!item) return;
+
+      const blob = new Blob([
+        `Plano de Aula Moçambicano — ${nome}\n`,
+        `Gerado em: ${new Date(item.data).toLocaleString('pt-MZ')}\n`,
+        `\nConteúdo gerado por: Plano de Aula MZ\n`,
+        `Usuário ID: ${USUARIO_ATUAL.substring(0,8)}...`
+      ], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = nome;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      alert(`📥 ${nome} baixado com sucesso.`);
+    }
+
+    // Garantir que novos PDFs sejam salvos no histórico (exemplo de uso)
+    // Exemplo: usar assim ao gerar um novo plano:
+    // salvarNoHistorico('Plano_9a_CI_23-12.pdf');
+
+    function salvarNoHistorico(nome) {
+      let historico = JSON.parse(localStorage.getItem(`historico_${USUARIO_ATUAL}`) || '[]');
+      historico.push({ nome, data: new Date().toISOString() });
+      localStorage.setItem(`historico_${USUARIO_ATUAL}`, JSON.stringify(historico));
+    }
 
     // Dark Mode
     document.getElementById('toggleDarkMode').addEventListener('change', function() {
@@ -672,7 +521,7 @@ function isAppInstalled() {
       if (navigator.clipboard) {
         navigator.clipboard.writeText(numero).then(() => {
           alert(`✅ ${numero} copiado!`);
-        }).catch(() => fallbackCopiar(numero));
+        }).catch(fallbackCopiar);
       } else {
         fallbackCopiar(numero);
       }
@@ -680,6 +529,8 @@ function isAppInstalled() {
     function fallbackCopiar(numero) {
       const el = document.createElement('textarea');
       el.value = numero;
+      el.style.position = 'absolute';
+      el.style.opacity = '0';
       document.body.appendChild(el);
       el.select();
       document.execCommand('copy');
@@ -687,99 +538,57 @@ function isAppInstalled() {
       alert(`✅ ${numero} copiado!`);
     }
 
-    // Histórico
-    function baixarPDF(nome) {
-      const blob = new Blob(['Plano de Aula Moçambicano — ', nome, '\nGerado em: ', new Date().toLocaleString('pt-MZ')], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = nome;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      let historico = JSON.parse(localStorage.getItem(`historico_${USUARIO_ATUAL}`) || '[]');
-      historico.push({ nome, data: new Date().toISOString() });
-      localStorage.setItem(`historico_${USUARIO_ATUAL}`, JSON.stringify(historico));
-      alert(`📥 ${nome} baixado e salvo no seu histórico.`);
-    }
-
-    // Abano da Sorte
-    function atualizarTentativas() {
-      const hoje = new Date().toDateString();
-      const dados = JSON.parse(localStorage.getItem(`sorte_${USUARIO_ATUAL}`) || '{}');
-      const tentativas = dados.data === hoje ? dados.tentativas : 0;
-      document.getElementById('mensagemTentativas').textContent = `Você já usou ${tentativas}/3 tentativas hoje.`;
-    }
-
-    function girarRoda() {
-      const hoje = new Date().toDateString();
-      let dados = JSON.parse(localStorage.getItem(`sorte_${USUARIO_ATUAL}`) || '{}');
-      if (dados.data !== hoje) dados = { data: hoje, tentativas: 0 };
-
-      if (dados.tentativas >= 3) {
-        alert('🚫 Limite atingido: 3 tentativas por dia.');
-        return;
-      }
-
-      dados.tentativas++;
-      localStorage.setItem(`sorte_${USUARIO_ATUAL}`, JSON.stringify(dados));
-      atualizarTentativas();
-
-      const ponteiro = document.getElementById('ponteiro');
-      const giros = 360 * 5 + Math.random() * 360;
-      ponteiro.style.transform = `translate(-50%, -100%) rotate(${giros}deg)`;
-
-      setTimeout(() => {
-        const angulo = giros % 360;
-        const setor = Math.floor(angulo / 90);
-
-        let resultado, mensagem, abrirWhatsApp = false;
-
-        if (setor === 0) {
-          resultado = 'Boa Sorte';
-          mensagem = '🌟 Boa sorte já é um presente! Tente novamente amanhã.';
-        } else if (setor === 1) {
-          resultado = 'Mensal';
-          abrirWhatsApp = true;
-          mensagem = '🎉 Parabéns! Você ganhou o *Plano Mensal*!';
-        } else if (setor === 2) {
-          resultado = 'Diário';
-          abrirWhatsApp = true;
-          mensagem = '🕒 Parabéns! Você ganhou o *Plano Diário*!';
-        } else {
-          resultado = 'Semanal';
-          abrirWhatsApp = true;
-          mensagem = '📅 Parabéns! Você ganhou o *Plano Semanal*!';
-        }
-
-        if (abrirWhatsApp) {
-          const codigo = `MZ-${resultado.substring(0,3).toUpperCase()}-${String(Date.now()).slice(-4)}`;
-          const texto = `Olá, ganhei o Plano ${resultado} no Abano da Sorte! Código: ${codigo}`;
-          const url = `https://wa.me/258876393961?text=${encodeURIComponent(texto)}`;
-          window.open(url, '_blank');
-        }
-
-        alert(mensagem);
-      }, 2100);
-    }
-
     // Atalho de teclado
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
-        ['modalAdmin','modalConta','modalDoacoes','modalHistorico','modalSorte','modalEstatisticas']
+        ['modalAdmin','modalConta','modalDoacoes','modalHistorico','modalEstatisticas']
           .forEach(id => fecharModal(id));
       }
     });
 
-    // Inicializar
-    atualizarTentativas();
+    // PWA
+    let deferredPrompt;
+    const pwaInstallPrompt = document.getElementById('pwaInstallPrompt');
 
-    // Verificar se é PWA instalado
-    if (isAppInstalled()) {
-      console.log('App executando como PWA instalado');
-      document.body.classList.add('pwa-installed');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      setTimeout(() => {
+        if (deferredPrompt && !isAppInstalled()) {
+          pwaInstallPrompt.style.display = 'block';
+        }
+      }, 5000);
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      pwaInstallPrompt.style.display = 'none';
+    });
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+          pwaInstallPrompt.style.display = 'none';
+        });
+      }
+    }
+
+    function dismissPWA() {
+      pwaInstallPrompt.style.display = 'none';
+    }
+
+    function isAppInstalled() {
+      return window.matchMedia('(display-mode: standalone)').matches || 
+             navigator.standalone ||
+             document.referrer.includes('android-app://');
+    }
+
+    // Service Worker (atualização automática)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').catch(err => console.warn('SW:', err));
+      navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
     }
   </script>
 </body>
