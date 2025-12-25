@@ -1,17 +1,8 @@
-# Ignorar arquivos temporários do sistema
 .DS_Store
 Thumbs.db
-
-# Ignorar pastas de cache ou build comuns
 node_modules/
 dist/
 build/
-
-# Ignorar arquivos ocultos, exceto a pasta .well-known
-.*
-!.well-known
-!.well-known/assetlinks.json
-
-# Ignorar outros arquivos que você não quer versionar
+.well-known/     # ← Especificamente ignora esta pasta
 *.log
 *.tmp
