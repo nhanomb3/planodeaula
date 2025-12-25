@@ -1,8 +1,17 @@
 .DS_Store
 Thumbs.db
+
+# Ignorar pastas de cache ou build comuns
 node_modules/
 dist/
 build/
-.well-known/     # ← Especificamente ignora esta pasta
+
+# Ignorar arquivos ocultos (incluindo .well-known)
+.*
+# REMOVA estas linhas:
+# !.well-known
+# !.well-known/assetlinks.json
+
+# Ignorar outros arquivos que você não quer versionar
 *.log
 *.tmp
