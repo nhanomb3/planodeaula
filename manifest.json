@@ -1,40 +1,48 @@
-// service-worker.js
-const CACHE_NAME = 'plano-aula-v1.0';
-const urlsToCache = [
-  '/planodeaula/',
-  '/planodeaula/index.html',
-  '/planodeaula/manifest.json',
-  '/planodeaula/icon-192x192.png',
-  '/planodeaula/icon-512x512.png'
-];
-
-// Instalação
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-  );
-});
-
-// Intercepta requisições
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
-  );
-});
-
-// Atualização
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cache => {
-          if (cache !== CACHE_NAME) {
-            return caches.delete(cache);
-          }
-        })
-      );
-    })
-  );
-});
+{
+  "name": "Plano de Aula MZ",
+  "short_name": "Plano Aula",
+  "description": "Aplicativo para criação e gerenciamento de planos de aula",
+  "start_url": "/planodeaula/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "scope": "/planodeaula/",
+  
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Tela principal do aplicativo"
+    }
+  ],
+  
+  "categories": ["education", "productivity"],
+  "dir": "ltr",
+  "lang": "pt-MZ",
+  
+  "related_applications": [{
+    "platform": "play",
+    "url": "https://play.google.com/store/apps/details?id=io.github.nhanomb3.twa",
+    "id": "io.github.nhanomb3.twa"
+  }],
+  
+  "prefer_related_applications": true
+}
