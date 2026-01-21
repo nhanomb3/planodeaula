@@ -3,6 +3,7 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/sobre.html',
+  '/.well-known/assetlinks.json',
   '/termos.html',
 ];
 
