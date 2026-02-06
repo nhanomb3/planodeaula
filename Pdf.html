@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerar PDF - Bloco de Planificação</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            margin: 30px 0;
+            overflow: hidden;
+            height: 30px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .status-container {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .status-step {
+            display: none;
+            font-size: 18px;
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .status-step.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        .step-1 {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .step-2 {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .step-3 {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            border: none;
+            text-decoration: none;
+            display: inline-block;
+            min-width: 180px;
+        }
+        
+        .primary-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+        
+        .secondary-btn {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: white;
+            box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
+        }
+        
+        .secondary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
+        }
+        
+        .success-btn {
+            background: linear-gradient(135deg, #27ae60, #219653);
+            color: white;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .success-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+        
+        .info-box {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: left;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            width: 150px;
+            color: #555;
+        }
+        
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+            margin: 20px 0;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gerando PDF do Bloco de Planificação</h1>
+        
+        <div id="infoContainer" class="info-box">
+            <!-- As informações serão carregadas aqui -->
+        </div>
+        
+        <div class="progress-container">
+            <div id="progressBar" class="progress-bar">0%</div>
+        </div>
+        
+        <div class="status-container">
+            <div id="step1" class="status-step step-1 active">
+                <strong>⏳ Passo 1/3:</strong> Carregando dados do PDF...
+            </div>
+            <div id="step2" class="status-step step-2">
+                <strong>📄 Passo 2/3:</strong> Montando o PDF...
+            </div>
+            <div id="step3" class="status-step step-3">
+                <strong>✅ Passo 3/3:</strong> PDF concluído!
+            </div>
+        </div>
+        
+        <div id="timer" class="timer">
+            Tempo estimado: <span id="countdown">15</span> segundos
+        </div>
+        
+        <div id="loadingSection">
+            <div class="btn-group">
+                <button id="generatePdfBtn" class="btn primary-btn">Iniciar Geração do PDF</button>
+                <a href="index.html" class="btn secondary-btn">Voltar ao Formulário</a>
+            </div>
+        </div>
+        
+        <div id="successSection" class="hidden">
+            <div style="margin: 30px 0;">
+                <h2 style="color: #27ae60;">✅ PDF Gerado com Sucesso!</h2>
+                <p>Seu bloco de planificação está pronto para download.</p>
+            </div>
+            
+            <div class="btn-group">
+                <button id="downloadPdfBtn" class="btn success-btn">📥 Baixar PDF</button>
+                <a href="index.html" class="btn secondary-btn">Criar Novo Bloco</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obter parâmetros da URL
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Extrair dados dos parâmetros
+            const dados = {
+                escola: urlParams.get('escola') || '',
+                professor: urlParams.get('professor') || '',
+                disciplina: urlParams.get('disciplina') || '',
+                classe: urlParams.get('classe') || '',
+                anoLectivo: urlParams.get('anoLectivo') || '',
+                numAulas: parseInt(urlParams.get('numAulas')) || 0,
+                dataGeracao: urlParams.get('dataGeracao') || '',
+                periodo: urlParams.get('periodo') || ''
+            };
+            
+            // Elementos DOM
+            const progressBar = document.getElementById('progressBar');
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const step3 = document.getElementById('step3');
+            const countdownElement = document.getElementById('countdown');
+            const timerElement = document.getElementById('timer');
+            const loadingSection = document.getElementById('loadingSection');
+            const successSection = document.getElementById('successSection');
+            const generatePdfBtn = document.getElementById('generatePdfBtn');
+            const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+            const infoContainer = document.getElementById('infoContainer');
+            
+            // Exibir informações na tela
+            infoContainer.innerHTML = `
+                <h3>📋 Dados do Bloco</h3>
+                <div class="info-row">
+                    <div class="info-label">Escola:</div>
+                    <div>${dados.escola || "Não informado"}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Professor:</div>
+                    <div>${dados.professor || "Não informado"}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Disciplina:</div>
+                    <div>${dados.disciplina || "Não informado"}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Classe:</div>
+                    <div>${dados.classe || "Não informado"}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Ano Lectivo:</div>
+                    <div>${dados.anoLectivo || "Não informado"}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Número de Aulas:</div>
+                    <div>${dados.numAulas} (${dados.numAulas * 2} páginas)</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Período:</div>
+                    <div>${dados.periodo || "Não informado"}</div>
+                </div>
+            `;
+            
+            // Formatar data
+            let dataFormatada = "_____/_________/20______";
+            if (dados.dataGeracao) {
+                const dataObj = new Date(dados.dataGeracao);
+                dataFormatada = dataObj.toLocaleDateString('pt-MZ', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            }
+            
+            // Variáveis para controle do processo
+            let progress = 0;
+            let countdown = 15;
+            let pdfDoc = null;
+            let pdfGenerated = false;
+            
+            // Função para atualizar a barra de progresso
+            function updateProgress(value) {
+                progress = Math.min(value, 100);
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = Math.round(progress) + '%';
+            }
+            
+            // Função para atualizar o contador
+            function updateCountdown() {
+                countdownElement.textContent = countdown;
+            }
+            
+            // Função para mudar o passo atual
+            function goToStep(stepNumber) {
+                step1.classList.remove('active');
+                step2.classList.remove('active');
+                step3.classList.remove('active');
+                
+                if (stepNumber === 1) {
+                    step1.classList.add('active');
+                    updateProgress(10);
+                } else if (stepNumber === 2) {
+                    step2.classList.add('active');
+                    updateProgress(50);
+                } else if (stepNumber === 3) {
+                    step3.classList.add('active');
+                    updateProgress(100);
+                }
+            }
+            
+            // Iniciar o processo de geração
+            generatePdfBtn.addEventListener('click', function() {
+                startGenerationProcess();
+            });
+            
+            // Função para iniciar o processo de geração
+            function startGenerationProcess() {
+                // Esconder botão de iniciar e mostrar contador
+                generatePdfBtn.disabled = true;
+                generatePdfBtn.textContent = "Gerando...";
+                timerElement.style.display = 'block';
+                
+                // Iniciar contador
+                const countdownInterval = setInterval(function() {
+                    countdown--;
+                    updateCountdown();
+                    
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        timerElement.style.display = 'none';
+                        completeGeneration();
+                    }
+                }, 1000);
+                
+                // Simular processo de 15 segundos
+                setTimeout(() => goToStep(1), 1000);
+                setTimeout(() => goToStep(2), 6000);
+                setTimeout(() => goToStep(3), 11000);
+                
+                // Atualizar barra de progresso gradualmente
+                const progressInterval = setInterval(function() {
+                    if (progress < 90) {
+                        updateProgress(progress + 6);
+                    } else {
+                        clearInterval(progressInterval);
+                    }
+                }, 900);
+            }
+            
+            // Função para completar a geração
+            function completeGeneration() {
+                updateProgress(100);
+                
+                // Gerar o PDF
+                generatePDF(dados, dataFormatada);
+                
+                // Mostrar seção de sucesso
+                loadingSection.classList.add('hidden');
+                successSection.classList.remove('hidden');
+            }
+            
+            // Botão para baixar PDF
+            downloadPdfBtn.addEventListener('click', function() {
+                if (pdfDoc && pdfGenerated) {
+                    const fileName = `Bloco_Planificacao_${dados.professor.replace(/\s+/g, '_')}_${dados.numAulas}_Aulas.pdf`;
+                    pdfDoc.save(fileName);
+                } else {
+                    alert("PDF ainda não foi gerado. Por favor, aguarde.");
+                }
+            });
+            
+            // Função para gerar o PDF
+            function generatePDF(dados, dataFormatada) {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF({
+                        orientation: 'landscape',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+                    
+                    // Configurações iniciais
+                    doc.setProperties({
+                        title: `Bloco de Planificação - ${dados.professor}`,
+                        subject: 'Plano de Aula',
+                        author: 'Plano de Aula MZ',
+                        creator: 'Sistema de Geração de Blocos'
+                    });
+                    
+                    // Página 1 - Cabeçalho
+                    doc.setFontSize(16);
+                    doc.setFont("helvetica", "bold");
+                    doc.text("REPÚBLICA DE MOÇAMBIQUE", 148, 20, { align: "center" });
+                    doc.text("MINISTÉRIO DA EDUCAÇÃO", 148, 30, { align: "center" });
+                    doc.text("BLOCO DE PLANIFICAÇÃO", 148, 40, { align: "center" });
+                    
+                    doc.setFontSize(12);
+                    doc.setFont("helvetica", "normal");
+                    doc.text(`ESCOLA: ${dados.escola || "___________________"}`, 20, 60);
+                    doc.text(`PROFESSOR: ${dados.professor || "___________________"}`, 20, 70);
+                    doc.text(`DISCIPLINA: ${dados.disciplina || "___________________"}`, 20, 80);
+                    doc.text(`CLASSE: ${dados.classe || "___________________"}`, 20, 90);
+                    doc.text(`BLOCO COM ${dados.numAulas} AULAS: ${dados.numAulas * 2} páginas`, 20, 100);
+                    doc.text(`DATA DE GERAÇÃO: ${dataFormatada}`, 20, 110);
+                    
+                    doc.setFontSize(10);
+                    doc.text("Documento gerado automaticamente pelo Plano de Aula MZ.", 148, 190, { align: "center" });
+                    
+                    // Gerar páginas de planos de aula
+                    for (let i = 1; i <= dados.numAulas; i++) {
+                        // Cada aula tem 2 páginas
+                        
+                        // Página ímpar - Parte 1 do plano de aula
+                        doc.addPage();
+                        doc.setFontSize(16);
+                        doc.setFont("helvetica", "bold");
+                        doc.text("PLANO DE AULA", 148, 20, { align: "center" });
+                        
+                        doc.setFontSize(11);
+                        doc.setFont("helvetica", "normal");
+                        
+                        let aulaYPos = 35;
+                        const infoAula = [
+                            `Escola: ${dados.escola || "___________________"}`,
+                            `Classe: ${dados.classe || "___________________"}`,
+                            `Professor: ${dados.professor || "___________________"}`,
+                            `Turma: ___________________`,
+                            `Disciplina: ${dados.disciplina || "___________________"}`,
+                            `Lição nº: ${i}`,
+                            `Unidade Temática: ___________________`,
+                            `Duração: ___________________`,
+                            `Tema: ___________________`,
+                            `Período: ${dados.periodo || "___________________"}`,
+                            `Tipo de Aula: ___________________`,
+                            `Data: ___/___/______`
+                        ];
+                        
+                        infoAula.forEach(info => {
+                            doc.text(info, 20, aulaYPos);
+                            aulaYPos += 7;
+                        });
+                        
+                        aulaYPos += 5;
+                        doc.setFont("helvetica", "bold");
+                        doc.text("OBJECTIVOS ESPECÍFICOS:", 20, aulaYPos);
+                        aulaYPos += 7;
+                        doc.setFont("helvetica", "normal");
+                        doc.text("• _________________________________", 20, aulaYPos);
+                        aulaYPos += 7;
+                        doc.text("• _________________________________", 20, aulaYPos);
+                        aulaYPos += 7;
+                        doc.text("• _________________________________", 20, aulaYPos);
+                        
+                        // Tabela para Introdução e Motivação / Mediação e Assimilação
+                        aulaYPos += 10;
+                        doc.autoTable({
+                            startY: aulaYPos,
+                            head: [['TEMPO', 'FUNÇÕES DIDÁCTICAS', 'CONTEÚDOS', 'ACTIVIDADES DO PROFESSOR', 'ACTIVIDADES DOS ALUNOS', 'MÉTODOS DE ENSINO', 'MEIOS DE ENSINO']],
+                            body: [
+                                [
+                                    {content: 'Introdução\ne Motivação', rowSpan: 2},
+                                    '___________________',
+                                    '___________________',
+                                    '___________________',
+                                    '___________________',
+                                    '___________________',
+                                    '___________________'
+                                ],
+                                [
+                                    'Mediação e Assimilação',
+                                    '___________________',
+                                    '___________________',
+                                    '___________________',
+                                    '___________________',
+                                    '___________________'
+                                ]
+                            ],
+                            theme: 'grid',
+                            headStyles: {fillColor: [220, 220, 220], fontSize: 8},
+                            bodyStyles: {fontSize: 8, cellPadding: 2},
+                            columnStyles: {
+                                0: {cellWidth: 20},
+                                1: {cellWidth: 25},
+                                2: {cellWidth: 25},
+                                3: {cellWidth: 25},
+                                4: {cellWidth: 25},
+                                5: {cellWidth: 25},
+                                6: {cellWidth: 25}
+                            },
+                            margin: {left: 10, right: 10}
+                        });
+                        
+                        // Página par - Parte 2 do plano de aula
+                        doc.addPage();
+                        
+                        // Tabela para Domínio e Consolidação / Controlo e Avaliação
+                        doc.autoTable({
+                            startY: 20,
+                            head: [['TEMPO', 'FUNÇÕES DIDÁCTICAS', 'CONTEÚDOS', 'ACTIVIDADES DO PROFESSOR', 'ACTIVIDADES DOS ALUNOS', 'MÉTODOS DE ENSINO', 'MEIOS DE ENSINO']],
+                            body: [
+                                [
+                                    {content: 'Domínio\ne Consolidação', rowSpan: 2},
+                                    '___________________',
+                                    '___________________',
+                                    '___________________',
+                                    '___________________',
+                                    '___________________',
+                                    '___________________'
+                                ],
+                                [
+                                    'Controlo e Avaliação',
+                                    '___________________',
+                                    '___________________',
+                                    '___________________',
+                                    '___________________',
+                                    '___________________'
+                                ]
+                            ],
+                            theme: 'grid',
+                            headStyles: {fillColor: [220, 220, 220], fontSize: 8},
+                            bodyStyles: {fontSize: 8, cellPadding: 2},
+                            columnStyles: {
+                                0: {cellWidth: 20},
+                                1: {cellWidth: 25},
+                                2: {cellWidth: 25},
+                                3: {cellWidth: 25},
+                                4: {cellWidth: 25},
+                                5: {cellWidth: 25},
+                                6: {cellWidth: 25}
+                            },
+                            margin: {left: 10, right: 10}
+                        });
+                        
+                        // Quadro Moral
+                        const lastAutoTable2 = doc.autoTable.previous;
+                        let finalY2 = lastAutoTable2 ? lastAutoTable2.finalY : 20;
+                        
+                        doc.setFontSize(12);
+                        doc.setFont("helvetica", "bold");
+                        doc.text("ANEXO / QUADRO MORAL", 148, finalY2 + 15, { align: "center" });
+                        
+                        doc.setFontSize(10);
+                        doc.setFont("helvetica", "normal");
+                        doc.text("Espaço para anotações e observações adicionais sobre a aula.", 148, finalY2 + 25, { align: "center" });
+                        
+                        // Rodapé com numeração de páginas
+                        doc.setFontSize(8);
+                        doc.text(`Página ${(i-1)*2 + 3} de ${dados.numAulas * 2 + 2} | Aula ${i} - Página 1/2`, 148, 195, { align: "center" });
+                        
+                        doc.setPage(i*2 + 2);
+                        doc.text(`Página ${(i-1)*2 + 4} de ${dados.numAulas * 2 + 2} | Aula ${i} - Página 2/2`, 148, 195, { align: "center" });
+                    }
+                    
+                    // Salvar referência do PDF
+                    pdfDoc = doc;
+                    pdfGenerated = true;
+                    
+                } catch (error) {
+                    console.error("Erro ao gerar PDF:", error);
+                    alert("Ocorreu um erro ao gerar o PDF. Por favor, tente novamente.");
+                }
+            }
+            
+            // Iniciar contador de tempo
+            updateCountdown();
+        });
+    </script>
+</body>
+</html>
