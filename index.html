@@ -144,7 +144,7 @@
             background-color: #2980b9;
         }
         
-        .pdf-btn {
+        .pdf-link {
             background-color: #27ae60;
             color: white;
             border: none;
@@ -159,13 +159,14 @@
             text-align: center;
         }
         
-        .pdf-btn:hover {
+        .pdf-link:hover {
             background-color: #219653;
         }
         
-        .pdf-btn:disabled {
+        .pdf-link.disabled {
             background-color: #95a5a6;
             cursor: not-allowed;
+            pointer-events: none;
         }
         
         .warning {
@@ -255,7 +256,7 @@
             
             <div class="btn-group">
                 <button class="generate-btn" id="generateBtn">Pré-visualizar Bloco</button>
-                <button class="pdf-btn" id="pdfBtn" disabled>Gerar PDF</button>
+                <a href="#" class="pdf-link disabled" id="pdfLink">Gerar PDF</a>
             </div>
         </div>
     </div>
@@ -266,51 +267,9 @@
             const escolaInput = document.getElementById('escola');
             const professorInput = document.getElementById('professor');
             const numAulasSelect = document.getElementById('numAulas');
-            const pdfBtn = document.getElementById('pdfBtn');
+            const pdfLink = document.getElementById('pdfLink');
             const priceContainer = document.getElementById('priceContainer');
             const priceValue = document.getElementById('priceValue');
-            
-            // Estado dos dados do formulário
-            let formData = {
-                escola: '',
-                professor: '',
-                disciplina: '',
-                classe: '',
-                anoLectivo: '',
-                numAulas: '',
-                dataGeracao: '',
-                periodo: ''
-            };
-            
-            // Atualizar dados do formulário quando os campos mudarem
-            function updateFormData() {
-                formData = {
-                    escola: escolaInput.value,
-                    professor: professorInput.value,
-                    disciplina: document.getElementById('disciplina').value,
-                    classe: document.getElementById('classe').value,
-                    anoLectivo: document.getElementById('anoLectivo').value,
-                    numAulas: numAulasSelect.value,
-                    dataGeracao: document.getElementById('dataGeracao').value,
-                    periodo: document.getElementById('periodo').value
-                };
-                
-                // Verificar se pode habilitar o botão Gerar PDF
-                validateForm();
-            }
-            
-            // Validar formulário e habilitar/desabilitar botão Gerar PDF
-            function validateForm() {
-                const isValid = formData.escola && formData.professor && formData.numAulas;
-                
-                if (isValid) {
-                    pdfBtn.disabled = false;
-                    pdfBtn.title = "Clique para gerar PDF";
-                } else {
-                    pdfBtn.disabled = true;
-                    pdfBtn.title = "Preencha todos os campos obrigatórios";
-                }
-            }
             
             // Calcular preço quando o número de aulas mudar
             numAulasSelect.addEventListener('change', function() {
@@ -322,50 +281,87 @@
                 } else {
                     priceContainer.style.display = 'none';
                 }
-                updateFormData();
+                updatePdfLink();
             });
             
-            // Atualizar dados quando qualquer campo mudar
+            // Atualizar link do PDF quando qualquer campo mudar
             const allInputs = document.querySelectorAll('input, select');
             allInputs.forEach(input => {
-                input.addEventListener('input', updateFormData);
-                input.addEventListener('change', updateFormData);
+                input.addEventListener('input', updatePdfLink);
+                input.addEventListener('change', updatePdfLink);
             });
+            
+            // Função para atualizar o link do PDF
+            function updatePdfLink() {
+                // Obter valores dos campos
+                const escola = escolaInput.value;
+                const professor = professorInput.value;
+                const numAulas = numAulasSelect.value;
+                const disciplina = document.getElementById('disciplina').value;
+                const classe = document.getElementById('classe').value;
+                const anoLectivo = document.getElementById('anoLectivo').value;
+                const dataGeracao = document.getElementById('dataGeracao').value;
+                const periodo = document.getElementById('periodo').value;
+                
+                // Verificar se campos obrigatórios estão preenchidos
+                if (escola && professor && numAulas) {
+                    // Construir URL com parâmetros
+                    const params = new URLSearchParams({
+                        escola: escola,
+                        professor: professor,
+                        disciplina: disciplina,
+                        classe: classe,
+                        anoLectivo: anoLectivo,
+                        numAulas: numAulas,
+                        dataGeracao: dataGeracao,
+                        periodo: periodo
+                    }).toString();
+                    
+                    // Atualizar href do link
+                    pdfLink.href = `pdf.html?${params}`;
+                    pdfLink.classList.remove('disabled');
+                } else {
+                    // Desabilitar link se campos obrigatórios não estiverem preenchidos
+                    pdfLink.href = '#';
+                    pdfLink.classList.add('disabled');
+                }
+            }
             
             // Botão Pré-visualizar
             document.getElementById('generateBtn').addEventListener('click', function() {
+                // Obter valores dos campos
+                const escola = escolaInput.value;
+                const professor = professorInput.value;
+                const numAulas = numAulasSelect.value;
+                const disciplina = document.getElementById('disciplina').value;
+                const classe = document.getElementById('classe').value;
+                const anoLectivo = document.getElementById('anoLectivo').value;
+                const dataGeracao = document.getElementById('dataGeracao').value;
+                const periodo = document.getElementById('periodo').value;
+                
                 // Validar campos obrigatórios
-                if (!formData.escola || !formData.professor || !formData.numAulas) {
+                if (!escola || !professor || !numAulas) {
                     alert('Por favor, preencha os campos obrigatórios (Escola, Professor e Número de Aulas).');
                     return;
                 }
                 
                 // Abrir pré-visualização em nova janela
-                openPreview();
-            });
-            
-            // Botão Gerar PDF
-            pdfBtn.addEventListener('click', function() {
-                if (pdfBtn.disabled) return;
+                const params = new URLSearchParams({
+                    escola: escola,
+                    professor: professor,
+                    disciplina: disciplina,
+                    classe: classe,
+                    anoLectivo: anoLectivo,
+                    numAulas: numAulas,
+                    dataGeracao: dataGeracao,
+                    periodo: periodo
+                }).toString();
                 
-                // Abrir página de geração de PDF
-                openPdfGenerator();
+                window.open(`preview.html?${params}`, '_blank');
             });
             
-            // Função para abrir pré-visualização
-            function openPreview() {
-                const previewUrl = `preview.html?escola=${encodeURIComponent(formData.escola)}&professor=${encodeURIComponent(formData.professor)}&disciplina=${encodeURIComponent(formData.disciplina)}&classe=${encodeURIComponent(formData.classe)}&anoLectivo=${encodeURIComponent(formData.anoLectivo)}&numAulas=${formData.numAulas}&dataGeracao=${encodeURIComponent(formData.dataGeracao)}&periodo=${encodeURIComponent(formData.periodo)}`;
-                window.open(previewUrl, '_blank');
-            }
-            
-            // Função para abrir gerador de PDF
-            function openPdfGenerator() {
-                const pdfUrl = `pdf.html?escola=${encodeURIComponent(formData.escola)}&professor=${encodeURIComponent(formData.professor)}&disciplina=${encodeURIComponent(formData.disciplina)}&classe=${encodeURIComponent(formData.classe)}&anoLectivo=${encodeURIComponent(formData.anoLectivo)}&numAulas=${formData.numAulas}&dataGeracao=${encodeURIComponent(formData.dataGeracao)}&periodo=${encodeURIComponent(formData.periodo)}`;
-                window.open(pdfUrl, '_blank');
-            }
-            
-            // Inicializar validação
-            validateForm();
+            // Inicializar link do PDF
+            updatePdfLink();
         });
     </script>
 </body>

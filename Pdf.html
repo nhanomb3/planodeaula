@@ -198,6 +198,12 @@
         .hidden {
             display: none !important;
         }
+        
+        .loading {
+            font-size: 18px;
+            color: #3498db;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -213,7 +219,7 @@
         </div>
         
         <div class="status-container">
-            <div id="step1" class="status-step step-1 active">
+            <div id="step1" class="status-step step-1">
                 <strong>⏳ Passo 1/3:</strong> Carregando dados do PDF...
             </div>
             <div id="step2" class="status-step step-2">
@@ -224,11 +230,14 @@
             </div>
         </div>
         
-        <div id="timer" class="timer">
+        <div id="timer" class="timer hidden">
             Tempo estimado: <span id="countdown">15</span> segundos
         </div>
         
         <div id="loadingSection">
+            <div class="loading" id="initialLoading">
+                Preparando geração do PDF... Por favor, aguarde.
+            </div>
             <div class="btn-group">
                 <button id="generatePdfBtn" class="btn primary-btn">Iniciar Geração do PDF</button>
                 <a href="index.html" class="btn secondary-btn">Voltar ao Formulário</a>
@@ -265,6 +274,17 @@
                 periodo: urlParams.get('periodo') || ''
             };
             
+            // Verificar se há dados suficientes
+            if (!dados.escola || !dados.professor || !dados.numAulas) {
+                document.getElementById('infoContainer').innerHTML = `
+                    <h3 style="color: #e74c3c;">⚠️ Dados Insuficientes</h3>
+                    <p>Os dados necessários para gerar o PDF não foram fornecidos corretamente.</p>
+                    <p>Por favor, volte ao <a href="index.html">formulário</a> e preencha todos os campos obrigatórios.</p>
+                `;
+                document.getElementById('loadingSection').classList.add('hidden');
+                return;
+            }
+            
             // Elementos DOM
             const progressBar = document.getElementById('progressBar');
             const step1 = document.getElementById('step1');
@@ -277,6 +297,7 @@
             const generatePdfBtn = document.getElementById('generatePdfBtn');
             const downloadPdfBtn = document.getElementById('downloadPdfBtn');
             const infoContainer = document.getElementById('infoContainer');
+            const initialLoading = document.getElementById('initialLoading');
             
             // Exibir informações na tela
             infoContainer.innerHTML = `
@@ -365,10 +386,17 @@
             
             // Função para iniciar o processo de geração
             function startGenerationProcess() {
-                // Esconder botão de iniciar e mostrar contador
+                // Esconder mensagem inicial e mostrar status
+                initialLoading.style.display = 'none';
+                
+                // Mostrar elementos de status
+                document.querySelector('.status-container').style.display = 'block';
+                document.querySelector('.progress-container').style.display = 'block';
+                timerElement.classList.remove('hidden');
+                
+                // Desabilitar botão de iniciar
                 generatePdfBtn.disabled = true;
                 generatePdfBtn.textContent = "Gerando...";
-                timerElement.style.display = 'block';
                 
                 // Iniciar contador
                 const countdownInterval = setInterval(function() {
@@ -405,8 +433,10 @@
                 generatePDF(dados, dataFormatada);
                 
                 // Mostrar seção de sucesso
-                loadingSection.classList.add('hidden');
-                successSection.classList.remove('hidden');
+                setTimeout(function() {
+                    loadingSection.classList.add('hidden');
+                    successSection.classList.remove('hidden');
+                }, 500);
             }
             
             // Botão para baixar PDF
@@ -613,6 +643,11 @@
             
             // Iniciar contador de tempo
             updateCountdown();
+            
+            // Iniciar geração automaticamente após 1 segundo
+            setTimeout(function() {
+                startGenerationProcess();
+            }, 1000);
         });
     </script>
 </body>
