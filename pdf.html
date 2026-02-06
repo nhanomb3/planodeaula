@@ -34,6 +34,14 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             padding: 40px;
             text-align: center;
+            position: relative;
+        }
+        
+        .blurred {
+            filter: blur(5px);
+            opacity: 0.5;
+            transition: all 0.5s ease;
+            pointer-events: none;
         }
         
         h1 {
@@ -43,63 +51,56 @@
             font-family: 'Times New Roman', serif;
         }
         
-        .progress-container {
+        .countdown-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            background-color: #f0f0f0;
-            border-radius: 10px;
-            margin: 30px 0;
-            overflow: hidden;
-            height: 30px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
         }
         
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #8BC34A);
-            width: 0%;
-            border-radius: 10px;
-            transition: width 0.5s ease-in-out;
+        .countdown-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .countdown-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db, #2980b9);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
+            font-size: 72px;
             font-weight: bold;
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
         }
         
-        .status-container {
-            margin: 30px 0;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .status-step {
-            display: none;
-            font-size: 18px;
-            margin: 15px 0;
-            padding: 15px;
-            border-radius: 8px;
+        .status-text {
+            font-size: 24px;
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 10px;
             font-family: 'Times New Roman', serif;
         }
         
-        .status-step.active {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-        
-        .step-1 {
-            background-color: #e3f2fd;
-            color: #1976d2;
-        }
-        
-        .step-2 {
-            background-color: #fff3e0;
-            color: #f57c00;
-        }
-        
-        .step-3 {
-            background-color: #e8f5e9;
-            color: #388e3c;
+        .status-subtext {
+            font-size: 18px;
+            color: #7f8c8d;
+            font-family: 'Times New Roman', serif;
         }
         
         .btn-group {
@@ -189,12 +190,19 @@
             font-family: 'Times New Roman', serif;
         }
         
-        .timer {
-            font-size: 24px;
-            font-weight: bold;
-            color: #3498db;
-            margin: 20px 0;
-            font-family: 'Times New Roman', serif;
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 15px 40px rgba(52, 152, 219, 0.4);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+            }
         }
         
         @keyframes fadeIn {
@@ -206,40 +214,50 @@
             display: none !important;
         }
         
+        .visible {
+            display: flex !important;
+            animation: fadeIn 0.5s;
+        }
+        
         .loading {
             font-size: 18px;
             color: #3498db;
             margin: 20px 0;
             font-family: 'Times New Roman', serif;
         }
+        
+        .success-message {
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .success-message h2 {
+            color: #27ae60;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .success-message p {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="countdownOverlay" class="countdown-overlay">
+        <div class="countdown-circle">
+            <span id="circleCountdown">15</span>
+        </div>
+        <div class="status-text" id="statusText">Carregando dados do PDF</div>
+        <div class="status-subtext" id="statusSubtext">Por favor, aguarde...</div>
+    </div>
+    
+    <div class="container" id="mainContainer">
         <h1>Gerando PDF do Bloco de Planificação</h1>
         
         <div id="infoContainer" class="info-box">
             <!-- As informações serão carregadas aqui -->
-        </div>
-        
-        <div class="progress-container">
-            <div id="progressBar" class="progress-bar">0%</div>
-        </div>
-        
-        <div class="status-container">
-            <div id="step1" class="status-step step-1">
-                <strong>⏳ Passo 1/3:</strong> Carregando dados do PDF...
-            </div>
-            <div id="step2" class="status-step step-2">
-                <strong>📄 Passo 2/3:</strong> Montando o PDF...
-            </div>
-            <div id="step3" class="status-step step-3">
-                <strong>✅ Passo 3/3:</strong> PDF concluído!
-            </div>
-        </div>
-        
-        <div id="timer" class="timer hidden">
-            Tempo estimado: <span id="countdown">15</span> segundos
         </div>
         
         <div id="loadingSection">
@@ -253,8 +271,8 @@
         </div>
         
         <div id="successSection" class="hidden">
-            <div style="margin: 30px 0;">
-                <h2 style="color: #27ae60;">✅ PDF Gerado com Sucesso!</h2>
+            <div class="success-message">
+                <h2>✅ PDF Gerado com Sucesso!</h2>
                 <p>Seu bloco de planificação está pronto para download.</p>
             </div>
             
@@ -294,12 +312,11 @@
             }
             
             // Elementos DOM
-            const progressBar = document.getElementById('progressBar');
-            const step1 = document.getElementById('step1');
-            const step2 = document.getElementById('step2');
-            const step3 = document.getElementById('step3');
-            const countdownElement = document.getElementById('countdown');
-            const timerElement = document.getElementById('timer');
+            const countdownOverlay = document.getElementById('countdownOverlay');
+            const circleCountdown = document.getElementById('circleCountdown');
+            const statusText = document.getElementById('statusText');
+            const statusSubtext = document.getElementById('statusSubtext');
+            const mainContainer = document.getElementById('mainContainer');
             const loadingSection = document.getElementById('loadingSection');
             const successSection = document.getElementById('successSection');
             const generatePdfBtn = document.getElementById('generatePdfBtn');
@@ -357,34 +374,15 @@
             let pdfDoc = null;
             let pdfGenerated = false;
             
-            // Função para atualizar a barra de progresso
-            function updateProgress(value) {
-                progress = Math.min(value, 100);
-                progressBar.style.width = progress + '%';
-                progressBar.textContent = Math.round(progress) + '%';
-            }
-            
-            // Função para atualizar o contador
+            // Atualizar a contagem no círculo
             function updateCountdown() {
-                countdownElement.textContent = countdown;
+                circleCountdown.textContent = countdown;
             }
             
-            // Função para mudar o passo atual
-            function goToStep(stepNumber) {
-                step1.classList.remove('active');
-                step2.classList.remove('active');
-                step3.classList.remove('active');
-                
-                if (stepNumber === 1) {
-                    step1.classList.add('active');
-                    updateProgress(10);
-                } else if (stepNumber === 2) {
-                    step2.classList.add('active');
-                    updateProgress(50);
-                } else if (stepNumber === 3) {
-                    step3.classList.add('active');
-                    updateProgress(100);
-                }
+            // Mostrar mensagem de status
+            function showStatus(message, submessage = "Por favor, aguarde...") {
+                statusText.textContent = message;
+                statusSubtext.textContent = submessage;
             }
             
             // Iniciar o processo de geração
@@ -394,51 +392,55 @@
             
             // Função para iniciar o processo de geração
             function startGenerationProcess() {
-                // Esconder mensagem inicial e mostrar status
-                initialLoading.style.display = 'none';
+                // Desfocar o conteúdo principal
+                mainContainer.classList.add('blurred');
                 
-                // Mostrar elementos de status
-                document.querySelector('.status-container').style.display = 'block';
-                document.querySelector('.progress-container').style.display = 'block';
-                timerElement.classList.remove('hidden');
+                // Mostrar overlay de contagem
+                countdownOverlay.classList.add('active');
                 
                 // Desabilitar botão de iniciar
                 generatePdfBtn.disabled = true;
                 generatePdfBtn.textContent = "Gerando...";
+                
+                // Atualizar contagem inicial
+                updateCountdown();
+                showStatus("Carregando dados do PDF");
                 
                 // Iniciar contador
                 const countdownInterval = setInterval(function() {
                     countdown--;
                     updateCountdown();
                     
+                    // Atualizar mensagens conforme o progresso
+                    if (countdown === 10) {
+                        showStatus("Processando dados");
+                    } else if (countdown === 7) {
+                        showStatus("Montando o PDF");
+                    } else if (countdown === 3) {
+                        showStatus("Finalizando PDF");
+                    }
+                    
                     if (countdown <= 0) {
                         clearInterval(countdownInterval);
-                        timerElement.style.display = 'none';
-                        completeGeneration();
+                        showStatus("PDF concluído!", "Aguarde um momento...");
+                        
+                        setTimeout(() => {
+                            completeGeneration();
+                        }, 1000);
                     }
                 }, 1000);
-                
-                // Simular processo de 15 segundos
-                setTimeout(() => goToStep(1), 1000);
-                setTimeout(() => goToStep(2), 6000);
-                setTimeout(() => goToStep(3), 11000);
-                
-                // Atualizar barra de progresso gradualmente
-                const progressInterval = setInterval(function() {
-                    if (progress < 90) {
-                        updateProgress(progress + 6);
-                    } else {
-                        clearInterval(progressInterval);
-                    }
-                }, 900);
             }
             
             // Função para completar a geração
             function completeGeneration() {
-                updateProgress(100);
-                
                 // Gerar o PDF
                 generatePDF(dados, dataFormatada);
+                
+                // Esconder overlay
+                countdownOverlay.classList.remove('active');
+                
+                // Remover blur do conteúdo principal
+                mainContainer.classList.remove('blurred');
                 
                 // Mostrar seção de sucesso
                 setTimeout(function() {
@@ -494,6 +496,13 @@
                         creator: 'Sistema de Geração de Blocos'
                     });
                     
+                    // ===== PÁGINA 1 =====
+                    // Adicionar borda dupla (APENAS PÁGINA 1)
+                    doc.setLineWidth(1.5);
+                    doc.rect(10, 10, 277, 187); // Borda externa
+                    doc.setLineWidth(0.8);
+                    doc.rect(12, 12, 273, 183); // Borda interna
+                    
                     // Carregar e adicionar imagem
                     try {
                         const imgUrl = 'https://raw.githubusercontent.com/nhanomb3/planodeaula/6143d599ba10a0f35fdf07a14baca1b76518bed3/1770417519977.png';
@@ -502,13 +511,6 @@
                     } catch (error) {
                         console.log('Imagem não carregada, continuando sem ela');
                     }
-                    
-                    // ===== PÁGINA 1 =====
-                    // Adicionar borda dupla
-                    doc.setLineWidth(1.5);
-                    doc.rect(10, 10, 277, 187); // Borda externa
-                    doc.setLineWidth(0.8);
-                    doc.rect(12, 12, 273, 183); // Borda interna
                     
                     // Título centralizado
                     doc.setFontSize(18);
@@ -539,7 +541,7 @@
                     // ===== PÁGINA 2 - DECLARAÇÃO PEDAGÓGICA =====
                     doc.addPage();
                     
-                    // Adicionar borda dupla
+                    // Adicionar borda dupla (APENAS PÁGINA 2)
                     doc.setLineWidth(1.5);
                     doc.rect(10, 10, 277, 187);
                     doc.setLineWidth(0.8);
@@ -556,13 +558,13 @@
                     const textoDeclaracao = [
                         "O presente documento constitui um instrumento oficial de planificação didática, elaborado em conformidade com as diretrizes curriculares nacionais e os princípios pedagógicos estabelecidos pelo Ministério da Educação de Moçambique.",
                         "",
-                        "Este bloco de planificação é de uso exclusivo e pessoal do docente acima identificado, destinando-se unicamente ao exercício profissional da atividade docente, com vista à organização, execução e avaliação do processo de ensino-aprendizagem.",
+                        `Este bloco de planificação é de uso exclusivo e pessoal do Professor ${dados.professor || "___________________"}, destinando-se unicamente ao exercício profissional da atividade docente, com vista à organização, execução e avaliação do processo de ensino-aprendizagem.`,
                         "",
-                        "O conteúdo aqui plasmado reflete o planeamento pedagógico do docente, baseado no programa curricular vigente, e deve ser utilizado com ética, responsabilidade e compromisso com a qualidade educativa.",
+                        "O conteúdo aqui plasmado reflete o planeamento pedagógico do Professor, baseado no programa curricular vigente, e deve ser utilizado com ética, responsabilidade e compromisso com a qualidade educativa.",
                         "",
-                        "Fica expressamente proibida a reprodução, distribuição, partilha ou utilização por terceiros não autorizados, resguardando-se os direitos de propriedade intelectual e as normas deontológicas da profissão docente.",
+                        "Fica expressamente proibida a reprodução, distribuição, partilha ou utilização por terceiros não autorizados, resguardando-se os direitos de propriedade intelectual e as normas deontológicas da profissão.",
                         "",
-                        "A presente declaração atesta a autenticidade e finalidade educativa deste documento, que poderá ser solicitado para fins de supervisão pedagógica e avaliação do desempenho docente, nos termos legais aplicáveis."
+                        `A presente declaração atesta a autenticidade e finalidade educativa deste documento, que poderá ser solicitado para fins de supervisão pedagógica e avaliação do desempenho do Professor ${dados.professor || "___________________"}, nos termos legais aplicáveis.`
                     ];
                     
                     textoDeclaracao.forEach(linha => {
@@ -596,11 +598,7 @@
                         // Página ímpar - Parte 1 do plano de aula
                         doc.addPage();
                         
-                        // Adicionar borda dupla
-                        doc.setLineWidth(1.5);
-                        doc.rect(10, 10, 277, 187);
-                        doc.setLineWidth(0.8);
-                        doc.rect(12, 12, 273, 183);
+                        // NÃO ADICIONAR BORDA - Removido código de borda
                         
                         // Cabeçalho do plano de aula
                         doc.setFontSize(16);
@@ -705,11 +703,7 @@
                         // Página par - Parte 2 do plano de aula
                         doc.addPage();
                         
-                        // Adicionar borda dupla
-                        doc.setLineWidth(1.5);
-                        doc.rect(10, 10, 277, 187);
-                        doc.setLineWidth(0.8);
-                        doc.rect(12, 12, 273, 183);
+                        // NÃO ADICIONAR BORDA - Removido código de borda
                         
                         // Continuar tabela
                         const lastAutoTable = doc.autoTable.previous;
@@ -794,9 +788,6 @@
                     alert("Ocorreu um erro ao gerar o PDF. Por favor, tente novamente.");
                 }
             }
-            
-            // Iniciar contador de tempo
-            updateCountdown();
             
             // Iniciar geração automaticamente após 1 segundo
             setTimeout(function() {
