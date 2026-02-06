@@ -11,7 +11,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Times New Roman', serif;
         }
         
         body {
@@ -40,6 +40,7 @@
             color: #2c3e50;
             margin-bottom: 20px;
             font-size: 28px;
+            font-family: 'Times New Roman', serif;
         }
         
         .progress-container {
@@ -78,6 +79,7 @@
             margin: 15px 0;
             padding: 15px;
             border-radius: 8px;
+            font-family: 'Times New Roman', serif;
         }
         
         .status-step.active {
@@ -119,6 +121,7 @@
             text-decoration: none;
             display: inline-block;
             min-width: 180px;
+            font-family: 'Times New Roman', serif;
         }
         
         .primary-btn {
@@ -162,12 +165,14 @@
             margin: 20px 0;
             text-align: left;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            font-family: 'Times New Roman', serif;
         }
         
         .info-box h3 {
             color: #2c3e50;
             margin-bottom: 15px;
             font-size: 20px;
+            font-family: 'Times New Roman', serif;
         }
         
         .info-row {
@@ -181,6 +186,7 @@
             font-weight: 600;
             width: 150px;
             color: #555;
+            font-family: 'Times New Roman', serif;
         }
         
         .timer {
@@ -188,6 +194,7 @@
             font-weight: bold;
             color: #3498db;
             margin: 20px 0;
+            font-family: 'Times New Roman', serif;
         }
         
         @keyframes fadeIn {
@@ -203,6 +210,7 @@
             font-size: 18px;
             color: #3498db;
             margin: 20px 0;
+            font-family: 'Times New Roman', serif;
         }
     </style>
 </head>
@@ -449,8 +457,27 @@
                 }
             });
             
+            // Função para carregar imagem
+            function loadImage(url) {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                        const dataUrl = canvas.toDataURL('image/png');
+                        resolve(dataUrl);
+                    };
+                    img.onerror = reject;
+                    img.src = url;
+                });
+            }
+            
             // Função para gerar o PDF
-            function generatePDF(dados, dataFormatada) {
+            async function generatePDF(dados, dataFormatada) {
                 try {
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF({
@@ -467,97 +494,202 @@
                         creator: 'Sistema de Geração de Blocos'
                     });
                     
-                    // Página 1 - Cabeçalho
+                    // Carregar e adicionar imagem
+                    try {
+                        const imgUrl = 'https://raw.githubusercontent.com/nhanomb3/planodeaula/6143d599ba10a0f35fdf07a14baca1b76518bed3/1770417519977.png';
+                        const imgData = await loadImage(imgUrl);
+                        doc.addImage(imgData, 'PNG', 148-15, 15, 30, 30); // Centralizada, tamanho menor
+                    } catch (error) {
+                        console.log('Imagem não carregada, continuando sem ela');
+                    }
+                    
+                    // ===== PÁGINA 1 =====
+                    // Adicionar borda dupla
+                    doc.setLineWidth(1.5);
+                    doc.rect(10, 10, 277, 187); // Borda externa
+                    doc.setLineWidth(0.8);
+                    doc.rect(12, 12, 273, 183); // Borda interna
+                    
+                    // Título centralizado
+                    doc.setFontSize(18);
+                    doc.setFont("times", "bold");
+                    doc.text("REPÚBLICA DE MOÇAMBIQUE", 148, 50, { align: "center" });
+                    doc.text("MINISTÉRIO DA EDUCAÇÃO", 148, 60, { align: "center" });
+                    doc.text("BLOCO DE PLANIFICAÇÃO", 148, 70, { align: "center" });
+                    
+                    // Linha com símbolo
+                    doc.setLineWidth(0.5);
+                    doc.line(60, 75, 235, 75);
+                    doc.setFontSize(14);
+                    doc.text("⬛", 148, 75, { align: "center" });
+                    
+                    // Informações centralizadas
+                    doc.setFontSize(12);
+                    doc.setFont("times", "normal");
+                    doc.text(`ESCOLA: ${dados.escola || "___________________"}`, 148, 90, { align: "center" });
+                    doc.text(`PROFESSOR: ${dados.professor || "___________________"}`, 148, 100, { align: "center" });
+                    doc.text(`DISCIPLINA: ${dados.disciplina || "___________________"}`, 148, 110, { align: "center" });
+                    doc.text(`CLASSE: ${dados.classe || "___________________"}`, 148, 120, { align: "center" });
+                    doc.text(`BLOCO COM ${dados.numAulas} AULAS: ${dados.numAulas * 2} páginas`, 148, 130, { align: "center" });
+                    
+                    // Data de geração no rodapé
+                    doc.setFontSize(10);
+                    doc.text(`Data de geração: ${dataFormatada}`, 148, 180, { align: "center" });
+                    
+                    // ===== PÁGINA 2 - DECLARAÇÃO PEDAGÓGICA =====
+                    doc.addPage();
+                    
+                    // Adicionar borda dupla
+                    doc.setLineWidth(1.5);
+                    doc.rect(10, 10, 277, 187);
+                    doc.setLineWidth(0.8);
+                    doc.rect(12, 12, 273, 183);
+                    
                     doc.setFontSize(16);
-                    doc.setFont("helvetica", "bold");
-                    doc.text("REPÚBLICA DE MOÇAMBIQUE", 148, 20, { align: "center" });
-                    doc.text("MINISTÉRIO DA EDUCAÇÃO", 148, 30, { align: "center" });
-                    doc.text("BLOCO DE PLANIFICAÇÃO", 148, 40, { align: "center" });
+                    doc.setFont("times", "bold");
+                    doc.text("DECLARAÇÃO PEDAGÓGICA", 148, 30, { align: "center" });
                     
                     doc.setFontSize(12);
-                    doc.setFont("helvetica", "normal");
-                    doc.text(`ESCOLA: ${dados.escola || "___________________"}`, 20, 60);
-                    doc.text(`PROFESSOR: ${dados.professor || "___________________"}`, 20, 70);
-                    doc.text(`DISCIPLINA: ${dados.disciplina || "___________________"}`, 20, 80);
-                    doc.text(`CLASSE: ${dados.classe || "___________________"}`, 20, 90);
-                    doc.text(`BLOCO COM ${dados.numAulas} AULAS: ${dados.numAulas * 2} páginas`, 20, 100);
-                    doc.text(`DATA DE GERAÇÃO: ${dataFormatada}`, 20, 110);
+                    doc.setFont("times", "normal");
                     
-                    doc.setFontSize(10);
-                    doc.text("Documento gerado automaticamente pelo Plano de Aula MZ.", 148, 190, { align: "center" });
+                    let yPos = 50;
+                    const textoDeclaracao = [
+                        "O presente documento constitui um instrumento oficial de planificação didática, elaborado em conformidade com as diretrizes curriculares nacionais e os princípios pedagógicos estabelecidos pelo Ministério da Educação de Moçambique.",
+                        "",
+                        "Este bloco de planificação é de uso exclusivo e pessoal do docente acima identificado, destinando-se unicamente ao exercício profissional da atividade docente, com vista à organização, execução e avaliação do processo de ensino-aprendizagem.",
+                        "",
+                        "O conteúdo aqui plasmado reflete o planeamento pedagógico do docente, baseado no programa curricular vigente, e deve ser utilizado com ética, responsabilidade e compromisso com a qualidade educativa.",
+                        "",
+                        "Fica expressamente proibida a reprodução, distribuição, partilha ou utilização por terceiros não autorizados, resguardando-se os direitos de propriedade intelectual e as normas deontológicas da profissão docente.",
+                        "",
+                        "A presente declaração atesta a autenticidade e finalidade educativa deste documento, que poderá ser solicitado para fins de supervisão pedagógica e avaliação do desempenho docente, nos termos legais aplicáveis."
+                    ];
                     
-                    // Gerar páginas de planos de aula
-                    for (let i = 1; i <= dados.numAulas; i++) {
-                        // Cada aula tem 2 páginas
+                    textoDeclaracao.forEach(linha => {
+                        if (yPos > 170) {
+                            doc.addPage();
+                            yPos = 30;
+                        }
                         
+                        if (linha === "") {
+                            yPos += 5;
+                        } else {
+                            const lines = doc.splitTextToSize(linha, 250);
+                            doc.text(lines, 20, yPos);
+                            yPos += lines.length * 7;
+                        }
+                    });
+                    
+                    yPos += 15;
+                    doc.text("ASSINATURA DO DOCENTE:", 20, yPos);
+                    yPos += 10;
+                    doc.text("_________________________________________", 20, yPos);
+                    yPos += 10;
+                    doc.text(dados.professor || "___________________", 20, yPos);
+                    
+                    // Data no rodapé
+                    doc.setFontSize(10);
+                    doc.text(`Data: ${dataFormatada}`, 148, 190, { align: "center" });
+                    
+                    // ===== PÁGINAS DE PLANO DE AULA =====
+                    for (let i = 1; i <= dados.numAulas; i++) {
                         // Página ímpar - Parte 1 do plano de aula
                         doc.addPage();
+                        
+                        // Adicionar borda dupla
+                        doc.setLineWidth(1.5);
+                        doc.rect(10, 10, 277, 187);
+                        doc.setLineWidth(0.8);
+                        doc.rect(12, 12, 273, 183);
+                        
+                        // Cabeçalho do plano de aula
                         doc.setFontSize(16);
-                        doc.setFont("helvetica", "bold");
-                        doc.text("PLANO DE AULA", 148, 20, { align: "center" });
+                        doc.setFont("times", "bold");
+                        doc.text("PLANO DE AULA", 148, 25, { align: "center" });
                         
-                        doc.setFontSize(11);
-                        doc.setFont("helvetica", "normal");
+                        // Informações organizadas
+                        doc.setFontSize(12);
+                        doc.setFont("times", "normal");
                         
-                        let aulaYPos = 35;
-                        const infoAula = [
-                            `Escola: ${dados.escola || "___________________"}`,
-                            `Classe: ${dados.classe || "___________________"}`,
-                            `Professor: ${dados.professor || "___________________"}`,
-                            `Turma: ___________________`,
-                            `Disciplina: ${dados.disciplina || "___________________"}`,
-                            `Lição nº: ${i}`,
-                            `Unidade Temática: ___________________`,
-                            `Duração: ___________________`,
-                            `Tema: ___________________`,
-                            `Período: ${dados.periodo || "___________________"}`,
-                            `Tipo de Aula: ___________________`,
-                            `Data: ___/___/______`
-                        ];
+                        // Lado esquerdo
+                        let leftY = 45;
+                        doc.text(`Escola: ${dados.escola || "___________________"}`, 20, leftY);
+                        leftY += 8;
+                        doc.text(`Data: __________/__________/__________`, 20, leftY);
+                        leftY += 8;
+                        doc.text(`Nome do Professor: ${dados.professor || "___________________"}`, 20, leftY);
+                        leftY += 8;
+                        doc.text(`Disciplina: ${dados.disciplina || "___________________"}`, 20, leftY);
+                        leftY += 8;
+                        doc.text(`Unidade temática: ___________________`, 20, leftY);
+                        leftY += 8;
+                        doc.text(`Tema: ___________________`, 20, leftY);
+                        leftY += 10;
                         
-                        infoAula.forEach(info => {
-                            doc.text(info, 20, aulaYPos);
-                            aulaYPos += 7;
-                        });
+                        doc.setFont("times", "bold");
+                        doc.text(`Objectivos:`, 20, leftY);
+                        doc.setFont("times", "normal");
+                        leftY += 8;
+                        doc.text(`Geral: ___________________________________________`, 30, leftY);
+                        leftY += 8;
+                        doc.text(`Específicos:`, 30, leftY);
+                        leftY += 8;
+                        doc.text(`Cognitivo: _____________________________________`, 40, leftY);
+                        leftY += 8;
+                        doc.text(`Psicomotor: ____________________________________`, 40, leftY);
+                        leftY += 8;
+                        doc.text(`Afetivo: _______________________________________`, 40, leftY);
                         
-                        aulaYPos += 5;
-                        doc.setFont("helvetica", "bold");
-                        doc.text("OBJECTIVOS ESPECÍFICOS:", 20, aulaYPos);
-                        aulaYPos += 7;
-                        doc.setFont("helvetica", "normal");
-                        doc.text("• _________________________________", 20, aulaYPos);
-                        aulaYPos += 7;
-                        doc.text("• _________________________________", 20, aulaYPos);
-                        aulaYPos += 7;
-                        doc.text("• _________________________________", 20, aulaYPos);
+                        // Lado direito
+                        let rightY = 45;
+                        doc.text(`Classe: ${dados.classe || "__________"}`, 160, rightY);
+                        rightY += 8;
+                        doc.text(`Turma: __________`, 160, rightY);
+                        rightY += 8;
+                        doc.text(`Período: ${dados.periodo || "__________"}`, 160, rightY);
+                        rightY += 8;
+                        doc.text(`Lição nº: ${i}`, 160, rightY);
+                        rightY += 8;
+                        doc.text(`Tipo de aula: __________`, 160, rightY);
+                        rightY += 8;
+                        doc.text(`Número de alunos: __________`, 160, rightY);
                         
                         // Tabela para Introdução e Motivação / Mediação e Assimilação
-                        aulaYPos += 10;
+                        leftY += 15;
                         doc.autoTable({
-                            startY: aulaYPos,
-                            head: [['TEMPO', 'FUNÇÕES DIDÁCTICAS', 'CONTEÚDOS', 'ACTIVIDADES DO PROFESSOR', 'ACTIVIDADES DOS ALUNOS', 'MÉTODOS DE ENSINO', 'MEIOS DE ENSINO']],
+                            startY: leftY,
+                            head: [[
+                                {content: 'TEMPO', styles: {fontSize: 10, fontStyle: 'bold'}},
+                                {content: 'FUNÇÕES DIDÁCTICAS', styles: {fontSize: 10, fontStyle: 'bold'}},
+                                {content: 'CONTEÚDOS', styles: {fontSize: 10, fontStyle: 'bold'}},
+                                {content: 'ACTIVIDADES DO PROFESSOR', styles: {fontSize: 10, fontStyle: 'bold'}},
+                                {content: 'ACTIVIDADES DOS ALUNOS', styles: {fontSize: 10, fontStyle: 'bold'}},
+                                {content: 'MÉTODOS DE ENSINO', styles: {fontSize: 10, fontStyle: 'bold'}},
+                                {content: 'MEIOS DE ENSINO', styles: {fontSize: 10, fontStyle: 'bold'}}
+                            ]],
                             body: [
                                 [
-                                    {content: 'Introdução\ne Motivação', rowSpan: 2},
-                                    '___________________',
-                                    '___________________',
-                                    '___________________',
-                                    '___________________',
-                                    '___________________',
-                                    '___________________'
+                                    {content: 'Introdução\n e Motivação', rowSpan: 2, styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}}
                                 ],
                                 [
-                                    'Mediação e Assimilação',
-                                    '___________________',
-                                    '___________________',
-                                    '___________________',
-                                    '___________________',
-                                    '___________________'
+                                    {content: 'Mediação e Assimilação', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}}
                                 ]
                             ],
                             theme: 'grid',
-                            headStyles: {fillColor: [220, 220, 220], fontSize: 8},
-                            bodyStyles: {fontSize: 8, cellPadding: 2},
+                            headStyles: {fillColor: [220, 220, 220], fontSize: 10, fontStyle: 'bold', font: 'times'},
+                            bodyStyles: {fontSize: 10, cellPadding: 3, font: 'times'},
                             columnStyles: {
                                 0: {cellWidth: 20},
                                 1: {cellWidth: 25},
@@ -573,32 +705,54 @@
                         // Página par - Parte 2 do plano de aula
                         doc.addPage();
                         
-                        // Tabela para Domínio e Consolidação / Controlo e Avaliação
+                        // Adicionar borda dupla
+                        doc.setLineWidth(1.5);
+                        doc.rect(10, 10, 277, 187);
+                        doc.setLineWidth(0.8);
+                        doc.rect(12, 12, 273, 183);
+                        
+                        // Continuar tabela
+                        const lastAutoTable = doc.autoTable.previous;
+                        let startY = 20;
+                        
+                        if (lastAutoTable && lastAutoTable.finalY) {
+                            startY = lastAutoTable.finalY + 10;
+                        }
+                        
                         doc.autoTable({
-                            startY: 20,
-                            head: [['TEMPO', 'FUNÇÕES DIDÁCTICAS', 'CONTEÚDOS', 'ACTIVIDADES DO PROFESSOR', 'ACTIVIDADES DOS ALUNOS', 'MÉTODOS DE ENSINO', 'MEIOS DE ENSINO']],
+                            startY: startY,
+                            head: [[
+                                {content: 'TEMPO', styles: {fontSize: 10, fontStyle: 'bold'}},
+                                {content: 'FUNÇÕES DIDÁCTICAS', styles: {fontSize: 10, fontStyle: 'bold'}},
+                                {content: 'CONTEÚDOS', styles: {fontSize: 10, fontStyle: 'bold'}},
+                                {content: 'ACTIVIDADES DO PROFESSOR', styles: {fontSize: 10, fontStyle: 'bold'}},
+                                {content: 'ACTIVIDADES DOS ALUNOS', styles: {fontSize: 10, fontStyle: 'bold'}},
+                                {content: 'MÉTODOS DE ENSINO', styles: {fontSize: 10, fontStyle: 'bold'}},
+                                {content: 'MEIOS DE ENSINO', styles: {fontSize: 10, fontStyle: 'bold'}}
+                            ]],
                             body: [
                                 [
-                                    {content: 'Domínio\ne Consolidação', rowSpan: 2},
-                                    '___________________',
-                                    '___________________',
-                                    '___________________',
-                                    '___________________',
-                                    '___________________',
-                                    '___________________'
+                                    {content: 'Domínio\ne Consolidação', rowSpan: 2, styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}}
                                 ],
                                 [
-                                    'Controlo e Avaliação',
-                                    '___________________',
-                                    '___________________',
-                                    '___________________',
-                                    '___________________',
-                                    '___________________'
+                                    {content: 'Controlo e Avaliação', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}},
+                                    {content: '___________________', styles: {fontSize: 10}}
                                 ]
                             ],
                             theme: 'grid',
-                            headStyles: {fillColor: [220, 220, 220], fontSize: 8},
-                            bodyStyles: {fontSize: 8, cellPadding: 2},
+                            headStyles: {fillColor: [220, 220, 220], fontSize: 10, fontStyle: 'bold', font: 'times'},
+                            bodyStyles: {fontSize: 10, cellPadding: 3, font: 'times'},
                             columnStyles: {
                                 0: {cellWidth: 20},
                                 1: {cellWidth: 25},
@@ -616,11 +770,11 @@
                         let finalY2 = lastAutoTable2 ? lastAutoTable2.finalY : 20;
                         
                         doc.setFontSize(12);
-                        doc.setFont("helvetica", "bold");
+                        doc.setFont("times", "bold");
                         doc.text("ANEXO / QUADRO MORAL", 148, finalY2 + 15, { align: "center" });
                         
                         doc.setFontSize(10);
-                        doc.setFont("helvetica", "normal");
+                        doc.setFont("times", "normal");
                         doc.text("Espaço para anotações e observações adicionais sobre a aula.", 148, finalY2 + 25, { align: "center" });
                         
                         // Rodapé com numeração de páginas
