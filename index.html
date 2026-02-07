@@ -47,7 +47,8 @@
             margin-top: 6px;
         }
 
-        .form-section {            padding: 30px;
+        .form-section {
+            padding: 30px;
         }
 
         h2 {
@@ -96,7 +97,8 @@
         }
 
         input, select {
-            width: 100%;            padding: 12px 14px;
+            width: 100%;
+            padding: 12px 14px;
             border: 1px solid #cbd5e0;
             border-radius: 8px;
             font-size: 16px;
@@ -145,7 +147,8 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;            text-decoration: none;
+            transition: all 0.2s ease;
+            text-decoration: none;
             text-align: center;
             display: inline-block;
         }
@@ -185,6 +188,16 @@
             pointer-events: none;
         }
 
+        .btn-mural-added {
+            background-color: #38a169 !important;
+            color: white !important;
+            border: none !important;
+        }
+
+        .btn-mural-added:hover {
+            background-color: #2d8556 !important;
+        }
+
         @media (max-width: 600px) {
             .form-group {
                 min-width: 100%;
@@ -194,14 +207,15 @@
             }
             .btn {
                 width: 100%;
-            }        }
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Bloco de Planificação Pedagógica</h1>
-            <p class="subtitle">Plano de Aula MZ </p>
+            <p class="subtitle">Plano de Aula MZ</p>
         </header>
 
         <div class="form-section">
@@ -243,7 +257,8 @@
             </div>
 
             <!-- Etapa 2 -->
-            <div class="step" id="step2">                <h2>Finalizar Bloco</h2>
+            <div class="step" id="step2">
+                <h2>Finalizar Bloco</h2>
 
                 <div class="form-row">
                     <div class="form-group">
@@ -286,13 +301,15 @@
                 <div class="price-info" id="priceInfo" style="display: none;">
                     <p>Valor a pagar:</p>
                     <div class="price-value" id="priceValue">0 MZN</div>
+                    <div id="muralInfo" style="font-size: 14px; margin-top: 5px; color: #2d3748;"></div>
                 </div>
 
                 <div class="btn-group">
                     <button class="btn btn-outline" id="prevBtn">Voltar</button>
                     <button class="btn btn-primary" id="generateBtn">Pré-visualizar Bloco</button>
                     <a href="#" class="btn btn-secondary disabled" id="pdfLink">Gerar PDF</a>
-                </div>            </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -318,6 +335,11 @@
             const priceValue = document.getElementById('priceValue');
             const pdfLink = document.getElementById('pdfLink');
             const muralBtn = document.getElementById('muralBtn');
+            const muralInfo = document.getElementById('muralInfo');
+
+            // Variável para controlar se o mural foi adicionado
+            let muralAdicionado = false;
+            const precoMural = 5; // 5 MZN por bloco
 
             // Ir para etapa 2
             function goToStep2() {
@@ -341,22 +363,51 @@
             if (nextBtn) nextBtn.addEventListener('click', e => { e.preventDefault(); goToStep2(); });
             if (prevBtn) prevBtn.addEventListener('click', e => { e.preventDefault(); goToStep1(); });
 
-            if (muralBtn) {                muralBtn.addEventListener('click', function () {
-                    window.open('pagina.html', '_blank');
+            // Evento do botão do mural
+            if (muralBtn) {
+                muralBtn.addEventListener('click', function () {
+                    if (confirm('Tem a certeza que pretende adicionar 1 página de Quadro Mural por aula?\n\nIsso irá adicionar uma página vertical adicional a cada aula e acrescentará 5 MZN ao valor total.')) {
+                        muralAdicionado = true;
+                        this.classList.remove('btn-outline');
+                        this.classList.add('btn-mural-added');
+                        this.innerHTML = '✓ Quadro Mural Adicionado';
+                        this.disabled = true;
+                        
+                        // Atualizar o preço
+                        updatePrice();
+                        updatePdfLink();
+                    }
                 });
             }
 
+            // Função para atualizar o preço
+            function updatePrice() {
+                const numAulas = parseInt(numAulasSelect.value);
+                if (numAulas) {
+                    const precoPor10 = 12; // preço base por 10 aulas
+                    let total = (numAulas / 10) * precoPor10;
+                    
+                    // Adicionar 5 MZN se o mural foi adicionado
+                    if (muralAdicionado) {
+                        total += precoMural;
+                        muralInfo.textContent = `Inclui ${numAulas} páginas de Quadro Mural`;
+                        muralInfo.style.display = 'block';
+                    } else {
+                        muralInfo.textContent = '';
+                        muralInfo.style.display = 'none';
+                    }
+                    
+                    priceValue.textContent = total.toFixed(2) + ' MZN';
+                    priceInfo.style.display = 'block';
+                } else {
+                    priceInfo.style.display = 'none';
+                }
+            }
+
+            // Atualizar preço quando mudar o número de aulas
             if (numAulasSelect) {
                 numAulasSelect.addEventListener('change', function () {
-                    const numAulas = parseInt(this.value);
-                    if (numAulas) {
-                        const precoPor10 = 12; // ajuste conforme sua regra
-                        const total = (numAulas / 10) * precoPor10;
-                        if (priceValue) priceValue.textContent = total + ' MZN';
-                        if (priceInfo) priceInfo.style.display = 'block';
-                    } else {
-                        if (priceInfo) priceInfo.style.display = 'none';
-                    }
+                    updatePrice();
                     updatePdfLink();
                 });
             }
@@ -371,7 +422,8 @@
                     anoLectivo: document.getElementById('anoLectivo')?.value?.trim() || '',
                     numAulas: document.getElementById('numAulas')?.value || '',
                     periodo: document.getElementById('periodo')?.value || '',
-                    dataGeracao: document.getElementById('dataGeracao')?.value || ''
+                    dataGeracao: document.getElementById('dataGeracao')?.value || '',
+                    muralAdicionado: muralAdicionado ? '1' : '0'
                 };
             }
 
@@ -391,6 +443,7 @@
                     }
                 }
             }
+
             // Monitorar campos
             const fieldIds = ['escola', 'professor', 'disciplina', 'classe', 'anoLectivo', 'periodo'];
             fieldIds.forEach(id => {
