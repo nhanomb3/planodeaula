@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title> Bloco de Planificação Pedagógica</title>
+    <title>Bloco de Planificação Pedagógica</title>
     <style>
         * {
             margin: 0;
@@ -131,22 +131,6 @@
             color: #2f855a;
         }
 
-        .mural-note {
-            font-size: 14px;
-            color: #4a5568;
-            margin-top: 28px;
-            padding-left: 8px;
-            align-self: flex-start;
-            display: flex;
-            align-items: center;
-        }
-
-        .mural-note::before {
-            content: "+";
-            font-weight: bold;
-            margin-right: 4px;
-            color: #3182ce;        }
-
         .btn-group {
             display: flex;
             gap: 15px;
@@ -161,8 +145,7 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
+            transition: all 0.2s ease;            text-decoration: none;
             text-align: center;
             display: inline-block;
         }
@@ -194,6 +177,7 @@
         .btn-outline:hover {
             background-color: #ebf8ff;
         }
+
         .btn-disabled {
             background-color: #e2e8f0 !important;
             color: #a0aec0 !important;
@@ -205,24 +189,19 @@
             .form-group {
                 min-width: 100%;
             }
-            .mural-note {
-                margin-top: 10px;
-                padding-left: 0;
-            }
             .btn-group {
                 flex-direction: column;
             }
             .btn {
                 width: 100%;
-            }
-        }
+            }        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1> Bloco de Planificação Pedagógica</h1>
-            <p class="subtitle">Plano de Aula MZ</p>
+            <h1>Bloco de Planificação Pedagógica</h1>
+            <p class="subtitle">Plano de Aula MZ </p>
         </header>
 
         <div class="form-section">
@@ -243,7 +222,8 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="disciplina">Disciplina</label>
-                        <input type="text" id="disciplina" placeholder="Ex: Matemática" />                    </div>
+                        <input type="text" id="disciplina" placeholder="Ex: Matemática" />
+                    </div>
                     <div class="form-group">
                         <label for="classe">Classe</label>
                         <input type="text" id="classe" placeholder="Ex: 10ª Classe" />
@@ -263,8 +243,7 @@
             </div>
 
             <!-- Etapa 2 -->
-            <div class="step" id="step2">
-                <h2>Finalizar Bloco</h2>
+            <div class="step" id="step2">                <h2>Finalizar Bloco</h2>
 
                 <div class="form-row">
                     <div class="form-group">
@@ -282,7 +261,7 @@
                     </div>
                 </div>
 
-                <!-- Número de Aulas + Nota do Quadro Mural -->
+                <!-- Número de Aulas + Botão do Quadro Mural -->
                 <div class="form-row">
                     <div class="form-group">
                         <label for="numAulas" class="required">Número de Aulas</label>
@@ -292,11 +271,14 @@
                             <option value="20">20 aulas (40 páginas)</option>
                             <option value="30">30 aulas (60 páginas)</option>
                             <option value="40">40 aulas (80 páginas)</option>
-                            <option value="50">50 aulas (100 páginas)</option>                            <option value="60">60 aulas (120 páginas)</option>
+                            <option value="50">50 aulas (100 páginas)</option>
+                            <option value="60">60 aulas (120 páginas)</option>
                         </select>
                     </div>
-                    <div class="mural-note">
-                        Adicionar 1 página de Quadro Mural
+                    <div class="form-group" style="display: flex; align-items: flex-end; min-width: auto;">
+                        <button type="button" id="muralBtn" class="btn btn-outline" style="height: fit-content; padding: 8px 12px; font-size: 14px; white-space: nowrap;">
+                            + Adicionar 1 página de Quadro Mural
+                        </button>
                     </div>
                 </div>
 
@@ -310,20 +292,23 @@
                     <button class="btn btn-outline" id="prevBtn">Voltar</button>
                     <button class="btn btn-primary" id="generateBtn">Pré-visualizar Bloco</button>
                     <a href="#" class="btn btn-secondary disabled" id="pdfLink">Gerar PDF</a>
-                </div>
-            </div>
+                </div>            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Definir data automática (dd/mm/aaaa)
             const today = new Date();
             const formattedDate = String(today.getDate()).padStart(2, '0') + '/' +
                                   String(today.getMonth() + 1).padStart(2, '0') + '/' +
                                   today.getFullYear();
             const dataGeracaoInput = document.getElementById('dataGeracao');
-            if (dataGeracaoInput) dataGeracaoInput.value = formattedDate;
+            if (dataGeracaoInput) {
+                dataGeracaoInput.value = formattedDate;
+            }
 
+            // Elementos
             const step1 = document.getElementById('step1');
             const step2 = document.getElementById('step2');
             const nextBtn = document.getElementById('nextBtn');
@@ -332,7 +317,9 @@
             const priceInfo = document.getElementById('priceInfo');
             const priceValue = document.getElementById('priceValue');
             const pdfLink = document.getElementById('pdfLink');
+            const muralBtn = document.getElementById('muralBtn');
 
+            // Ir para etapa 2
             function goToStep2() {
                 const escola = document.getElementById('escola')?.value?.trim() || '';
                 const professor = document.getElementById('professor')?.value?.trim() || '';
@@ -341,21 +328,29 @@
                     return;
                 }
                 step1.classList.remove('active');
-                step2.classList.add('active');            }
+                step2.classList.add('active');
+            }
 
+            // Voltar para etapa 1
             function goToStep1() {
                 step2.classList.remove('active');
                 step1.classList.add('active');
             }
 
+            // Eventos
             if (nextBtn) nextBtn.addEventListener('click', e => { e.preventDefault(); goToStep2(); });
             if (prevBtn) prevBtn.addEventListener('click', e => { e.preventDefault(); goToStep1(); });
+
+            if (muralBtn) {                muralBtn.addEventListener('click', function () {
+                    window.open('pagina.html', '_blank');
+                });
+            }
 
             if (numAulasSelect) {
                 numAulasSelect.addEventListener('change', function () {
                     const numAulas = parseInt(this.value);
                     if (numAulas) {
-                        const precoPor10 = 12;
+                        const precoPor10 = 12; // ajuste conforme sua regra
                         const total = (numAulas / 10) * precoPor10;
                         if (priceValue) priceValue.textContent = total + ' MZN';
                         if (priceInfo) priceInfo.style.display = 'block';
@@ -366,6 +361,7 @@
                 });
             }
 
+            // Coletar dados
             function getFormData() {
                 return {
                     escola: document.getElementById('escola')?.value?.trim() || '',
@@ -379,6 +375,7 @@
                 };
             }
 
+            // Atualizar link do PDF
             function updatePdfLink() {
                 const data = getFormData();
                 if (data.escola && data.professor && data.numAulas) {
@@ -390,10 +387,11 @@
                 } else {
                     if (pdfLink) {
                         pdfLink.href = '#';
-                        pdfLink.classList.add('disabled');                    }
+                        pdfLink.classList.add('disabled');
+                    }
                 }
             }
-
+            // Monitorar campos
             const fieldIds = ['escola', 'professor', 'disciplina', 'classe', 'anoLectivo', 'periodo'];
             fieldIds.forEach(id => {
                 const el = document.getElementById(id);
@@ -403,6 +401,7 @@
                 }
             });
 
+            // Pré-visualizar
             const generateBtn = document.getElementById('generateBtn');
             if (generateBtn) {
                 generateBtn.addEventListener('click', function (e) {
@@ -417,6 +416,7 @@
                 });
             }
 
+            // Inicializar
             updatePdfLink();
         });
     </script>
