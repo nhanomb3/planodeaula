@@ -830,7 +830,7 @@
                         leftY += 6;
                         doc.text(`Unidade Temática: ___________________`, 15, leftY);
                         leftY += 6;
-                        doc.text(`Tema: ___________________`, 15, leftY);
+                        doc.text(`Tema: ___________________________________`, 15, leftY);
                         leftY += 8; // Espaço de uma linha entre tema e objetivo geral
                         
                         // Objetivo Geral com traço em negrito
@@ -839,7 +839,7 @@
                         leftY += 10;
                         
                         // Coluna direita - informações atualizadas
-                        let rightY = 35;
+                        let rightY = 41;
                         doc.setFont("times", "bold");
                         doc.text(`Classe: ${dados.classe || "__________"}`, 155, rightY);
                         doc.setFont("times", "normal");
