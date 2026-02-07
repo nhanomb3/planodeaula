@@ -737,8 +737,6 @@
                         rightY += 6;
                         doc.text(`Número de alunos: __________`, 155, rightY);
                         
-                        // Linha horizontal
-                        doc.setLineWidth(0.5);
                         doc.line(15, Math.max(leftY, rightY) + 5, 277, Math.max(leftY, rightY) + 5);
                         
                         // Objectivos específicos atualizados
@@ -753,8 +751,6 @@
                         objY += 6;
                         doc.text("3. Afetivo: ___________________________________________________", 20, objY);
                         
-                        // Linha horizontal
-                        doc.setLineWidth(0.5);
                         doc.line(15, objY + 8, 277, objY + 8);
                         
                         // TABELA PRINCIPAL - Página 1
@@ -773,7 +769,7 @@
                         let xPos = 15;
                         const headerY = tableY;
                         
-                        const headers = ["TEMPO", "FUNÇÕES DIDÁCTICAS", "CONTEÚDOS", "ACTIVIDADES DO PROFESSOR", "ACTIVIDADES DOS ALUNOS", "MÉTODOS DE ENSINO", "MEIOS DE ENSINO"];
+                        const headers = ["TEMPO", "FUNÇÃO DIDÁCTICA", "CONTEÚDOS", "ACTIVIDADES DO PROFESSOR", "ACTIVIDADES DOS ALUNOS", "MÉTODOS DE ENSINO", "MEIOS DE ENSINO"];
                         
                         headers.forEach((header, index) => {
                             doc.setFillColor(240, 240, 240);
