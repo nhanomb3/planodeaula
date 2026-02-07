@@ -51,13 +51,13 @@
             font-family: 'Times New Roman', serif;
         }
         
-        .countdown-overlay {
+        .processing-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -68,25 +68,35 @@
             transition: all 0.5s ease;
         }
         
-        .countdown-overlay.active {
+        .processing-overlay.active {
             opacity: 1;
             visibility: visible;
         }
         
-        .countdown-circle {
+        .spinner-container {
+            position: relative;
             width: 200px;
             height: 200px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 72px;
-            font-weight: bold;
-            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
             margin-bottom: 30px;
-            animation: pulse 2s infinite;
+        }
+        
+        .spinner {
+            width: 100%;
+            height: 100%;
+            border: 8px solid rgba(52, 152, 219, 0.2);
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
+        
+        .percentage-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: #2c3e50;
         }
         
         .status-text {
@@ -190,19 +200,9 @@
             font-family: 'Times New Roman', serif;
         }
         
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 15px 40px rgba(52, 152, 219, 0.4);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
-            }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         @keyframes fadeIn {
@@ -242,15 +242,84 @@
             color: #555;
             margin-bottom: 20px;
         }
+        
+        .progress-stages {
+            margin-top: 20px;
+            width: 80%;
+            max-width: 400px;
+        }
+        
+        .progress-stage {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .progress-stage.active {
+            background: #e3f2fd;
+            border-left: 4px solid #3498db;
+        }
+        
+        .stage-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .stage-check.completed {
+            background: #27ae60;
+        }
+        
+        .stage-text {
+            flex: 1;
+            text-align: left;
+            font-size: 14px;
+        }
+        
+        .stage-text.completed {
+            color: #27ae60;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <div id="countdownOverlay" class="countdown-overlay">
-        <div class="countdown-circle">
-            <span id="circleCountdown">15</span>
+    <div id="processingOverlay" class="processing-overlay">
+        <div class="spinner-container">
+            <div class="spinner"></div>
+            <div class="percentage-circle" id="percentageCircle">0%</div>
         </div>
-        <div class="status-text" id="statusText">Carregando dados do PDF</div>
-        <div class="status-subtext" id="statusSubtext">Por favor, aguarde...</div>
+        <div class="status-text" id="statusText">Iniciando Processo</div>
+        <div class="status-subtext" id="statusSubtext">Preparando a geração do PDF...</div>
+        
+        <div class="progress-stages">
+            <div class="progress-stage" id="stage1">
+                <div class="stage-check">1</div>
+                <div class="stage-text">Carregando Dados</div>
+            </div>
+            <div class="progress-stage" id="stage2">
+                <div class="stage-check">2</div>
+                <div class="stage-text">Processando Informações</div>
+            </div>
+            <div class="progress-stage" id="stage3">
+                <div class="stage-check">3</div>
+                <div class="stage-text">Gerando PDF</div>
+            </div>
+            <div class="progress-stage" id="stage4">
+                <div class="stage-check">4</div>
+                <div class="stage-text">Finalizando</div>
+            </div>
+        </div>
     </div>
     
     <div class="container" id="mainContainer">
@@ -312,8 +381,8 @@
             }
             
             // Elementos DOM
-            const countdownOverlay = document.getElementById('countdownOverlay');
-            const circleCountdown = document.getElementById('circleCountdown');
+            const processingOverlay = document.getElementById('processingOverlay');
+            const percentageCircle = document.getElementById('percentageCircle');
             const statusText = document.getElementById('statusText');
             const statusSubtext = document.getElementById('statusSubtext');
             const mainContainer = document.getElementById('mainContainer');
@@ -324,7 +393,13 @@
             const infoContainer = document.getElementById('infoContainer');
             const initialLoading = document.getElementById('initialLoading');
             
-            // Exibir informações na tela
+            // Elementos dos estágios
+            const stage1 = document.getElementById('stage1');
+            const stage2 = document.getElementById('stage2');
+            const stage3 = document.getElementById('stage3');
+            const stage4 = document.getElementById('stage4');
+            
+            // Exibir informações na tela inicialmente (serão escondidas durante o processamento)
             infoContainer.innerHTML = `
                 <h3>📋 Dados do Bloco</h3>
                 <div class="info-row">
@@ -369,20 +444,60 @@
             }
             
             // Variáveis para controle do processo
-            let progress = 0;
-            let countdown = 15;
+            let currentPercentage = 0;
             let pdfDoc = null;
             let pdfGenerated = false;
+            let progressInterval = null;
             
-            // Atualizar a contagem no círculo
-            function updateCountdown() {
-                circleCountdown.textContent = countdown;
+            // Atualizar a porcentagem no círculo
+            function updatePercentage(percentage) {
+                currentPercentage = percentage;
+                percentageCircle.textContent = `${percentage}%`;
+                
+                // Atualizar estágios baseado na porcentagem
+                updateStages(percentage);
+            }
+            
+            // Atualizar os estágios do progresso
+            function updateStages(percentage) {
+                // Resetar todos os estágios
+                [stage1, stage2, stage3, stage4].forEach(stage => {
+                    stage.classList.remove('active');
+                    stage.querySelector('.stage-check').classList.remove('completed');
+                    stage.querySelector('.stage-text').classList.remove('completed');
+                });
+                
+                // Ativar estágios baseado na porcentagem
+                if (percentage >= 0) {
+                    stage1.classList.add('active');
+                }
+                if (percentage >= 25) {
+                    stage1.querySelector('.stage-check').classList.add('completed');
+                    stage1.querySelector('.stage-text').classList.add('completed');
+                    stage2.classList.add('active');
+                }
+                if (percentage >= 50) {
+                    stage2.querySelector('.stage-check').classList.add('completed');
+                    stage2.querySelector('.stage-text').classList.add('completed');
+                    stage3.classList.add('active');
+                }
+                if (percentage >= 75) {
+                    stage3.querySelector('.stage-check').classList.add('completed');
+                    stage3.querySelector('.stage-text').classList.add('completed');
+                    stage4.classList.add('active');
+                }
+                if (percentage >= 100) {
+                    stage4.querySelector('.stage-check').classList.add('completed');
+                    stage4.querySelector('.stage-text').classList.add('completed');
+                }
             }
             
             // Mostrar mensagem de status
-            function showStatus(message, submessage = "Por favor, aguarde...") {
+            function showStatus(message, submessage = "") {
                 statusText.textContent = message;
-                statusSubtext.textContent = submessage;
+                if (submessage) {
+                    statusSubtext.textContent = submessage;
+                }
             }
             
             // Iniciar o processo de geração
@@ -392,61 +507,81 @@
             
             // Função para iniciar o processo de geração
             function startGenerationProcess() {
+                // Esconder informações do bloco
+                infoContainer.classList.add('hidden');
+                loadingSection.classList.add('hidden');
+                
                 // Desfocar o conteúdo principal
                 mainContainer.classList.add('blurred');
                 
-                // Mostrar overlay de contagem
-                countdownOverlay.classList.add('active');
+                // Mostrar overlay de processamento
+                processingOverlay.classList.add('active');
                 
                 // Desabilitar botão de iniciar
                 generatePdfBtn.disabled = true;
                 generatePdfBtn.textContent = "Gerando...";
                 
-                // Atualizar contagem inicial
-                updateCountdown();
-                showStatus("Carregando dados do PDF");
+                // Iniciar progresso da porcentagem
+                currentPercentage = 0;
+                updatePercentage(0);
+                showStatus("Iniciando Processo", "Preparando a geração do PDF...");
                 
-                // Iniciar contador
-                const countdownInterval = setInterval(function() {
-                    countdown--;
-                    updateCountdown();
-                    
-                    // Atualizar mensagens conforme o progresso
-                    if (countdown === 10) {
-                        showStatus("Processando dados");
-                    } else if (countdown === 7) {
-                        showStatus("Montando o PDF");
-                    } else if (countdown === 3) {
-                        showStatus("Finalizando PDF");
-                    }
-                    
-                    if (countdown <= 0) {
-                        clearInterval(countdownInterval);
-                        showStatus("PDF concluído!", "Aguarde um momento...");
+                // Iniciar intervalo de progresso
+                progressInterval = setInterval(function() {
+                    if (currentPercentage < 90) {
+                        // Incremento baseado no tempo
+                        let increment = 1;
+                        if (currentPercentage < 30) {
+                            increment = 2; // Mais rápido no início
+                        } else if (currentPercentage < 60) {
+                            increment = 1.5; // Velocidade média
+                        }
                         
-                        setTimeout(() => {
-                            completeGeneration();
-                        }, 1000);
+                        currentPercentage += increment;
+                        if (currentPercentage > 90) currentPercentage = 90;
+                        updatePercentage(Math.round(currentPercentage));
+                        
+                        // Atualizar mensagens conforme o progresso
+                        if (currentPercentage < 25) {
+                            showStatus("Carregando Dados", "Obtendo informações do formulário...");
+                        } else if (currentPercentage < 50) {
+                            showStatus("Processando Informações", "Organizando dados para o PDF...");
+                        } else if (currentPercentage < 75) {
+                            showStatus("Gerando PDF", "Criando páginas do bloco de planificação...");
+                        } else {
+                            showStatus("Finalizando", "Preparando para download...");
+                        }
                     }
-                }, 1000);
+                }, 100);
+                
+                // Iniciar geração do PDF após um pequeno delay
+                setTimeout(() => {
+                    generatePDF(dados, dataFormatada);
+                }, 500);
             }
             
             // Função para completar a geração
             function completeGeneration() {
-                // Gerar o PDF
-                generatePDF(dados, dataFormatada);
+                // Parar o intervalo de progresso
+                if (progressInterval) {
+                    clearInterval(progressInterval);
+                }
                 
-                // Esconder overlay
-                countdownOverlay.classList.remove('active');
+                // Ir direto para 100%
+                updatePercentage(100);
+                showStatus("Processo Concluído!", "PDF gerado com sucesso!");
                 
-                // Remover blur do conteúdo principal
-                mainContainer.classList.remove('blurred');
-                
-                // Mostrar seção de sucesso
-                setTimeout(function() {
-                    loadingSection.classList.add('hidden');
+                // Esperar um pouco para mostrar a conclusão
+                setTimeout(() => {
+                    // Esconder overlay
+                    processingOverlay.classList.remove('active');
+                    
+                    // Remover blur do conteúdo principal
+                    mainContainer.classList.remove('blurred');
+                    
+                    // Mostrar seção de sucesso
                     successSection.classList.remove('hidden');
-                }, 500);
+                }, 1000);
             }
             
             // Botão para baixar PDF
@@ -595,197 +730,241 @@
                     
                     // ===== PÁGINAS DE PLANO DE AULA =====
                     for (let i = 1; i <= dados.numAulas; i++) {
-                        // Página ímpar - Parte 1 do plano de aula
+                        // PÁGINA 1 DA AULA - Layout conforme imagem 1
                         doc.addPage();
                         
-                        // NÃO ADICIONAR BORDA - Removido código de borda
-                        
-                        // Cabeçalho do plano de aula
-                        doc.setFontSize(16);
+                        // Título grande no topo
+                        doc.setFontSize(20);
                         doc.setFont("times", "bold");
                         doc.text("PLANO DE AULA", 148, 25, { align: "center" });
                         
-                        // Informações organizadas
+                        // Informações em duas colunas
                         doc.setFontSize(12);
                         doc.setFont("times", "normal");
                         
-                        // Lado esquerdo
-                        let leftY = 45;
+                        // Coluna esquerda
+                        let leftY = 40;
                         doc.text(`Escola: ${dados.escola || "___________________"}`, 20, leftY);
-                        leftY += 8;
-                        doc.text(`Data: __________/__________/__________`, 20, leftY);
-                        leftY += 8;
-                        doc.text(`Nome do Professor: ${dados.professor || "___________________"}`, 20, leftY);
-                        leftY += 8;
+                        leftY += 7;
+                        doc.text(`Professor: ${dados.professor || "___________________"}`, 20, leftY);
+                        leftY += 7;
                         doc.text(`Disciplina: ${dados.disciplina || "___________________"}`, 20, leftY);
-                        leftY += 8;
-                        doc.text(`Unidade temática: ___________________`, 20, leftY);
-                        leftY += 8;
+                        leftY += 7;
+                        doc.text(`Unidade Temática: ___________________`, 20, leftY);
+                        leftY += 7;
                         doc.text(`Tema: ___________________`, 20, leftY);
-                        leftY += 10;
+                        leftY += 7;
+                        doc.text(`Tipo de Aula: ___________________`, 20, leftY);
                         
+                        // Coluna direita
+                        let rightY = 40;
                         doc.setFont("times", "bold");
-                        doc.text(`Objectivos:`, 20, leftY);
+                        doc.text(`CLASS: ${dados.classe || "__________"}`, 160, rightY);
                         doc.setFont("times", "normal");
-                        leftY += 8;
-                        doc.text(`Geral: ___________________________________________`, 30, leftY);
-                        leftY += 8;
-                        doc.text(`Específicos:`, 30, leftY);
-                        leftY += 8;
-                        doc.text(`Cognitivo: _____________________________________`, 40, leftY);
-                        leftY += 8;
-                        doc.text(`Psicomotor: ____________________________________`, 40, leftY);
-                        leftY += 8;
-                        doc.text(`Afetivo: _______________________________________`, 40, leftY);
-                        
-                        // Lado direito
-                        let rightY = 45;
-                        doc.text(`Classe: ${dados.classe || "__________"}`, 160, rightY);
-                        rightY += 8;
+                        rightY += 7;
                         doc.text(`Turma: __________`, 160, rightY);
-                        rightY += 8;
-                        doc.text(`Período: ${dados.periodo || "__________"}`, 160, rightY);
-                        rightY += 8;
+                        rightY += 7;
                         doc.text(`Lição nº: ${i}`, 160, rightY);
-                        rightY += 8;
-                        doc.text(`Tipo de aula: __________`, 160, rightY);
-                        rightY += 8;
-                        doc.text(`Número de alunos: __________`, 160, rightY);
+                        rightY += 7;
+                        doc.text(`Duração: __________`, 160, rightY);
+                        rightY += 7;
+                        doc.text(`Período: ${dados.periodo || "__________"}`, 160, rightY);
+                        rightY += 7;
+                        doc.text(`Data: __________/__________/__________`, 160, rightY);
                         
-                        // Tabela para Introdução e Motivação / Mediação e Assimilação
-                        leftY += 15;
-                        doc.autoTable({
-                            startY: leftY,
-                            head: [[
-                                {content: 'TEMPO', styles: {fontSize: 10, fontStyle: 'bold'}},
-                                {content: 'FUNÇÕES DIDÁCTICAS', styles: {fontSize: 10, fontStyle: 'bold'}},
-                                {content: 'CONTEÚDOS', styles: {fontSize: 10, fontStyle: 'bold'}},
-                                {content: 'ACTIVIDADES DO PROFESSOR', styles: {fontSize: 10, fontStyle: 'bold'}},
-                                {content: 'ACTIVIDADES DOS ALUNOS', styles: {fontSize: 10, fontStyle: 'bold'}},
-                                {content: 'MÉTODOS DE ENSINO', styles: {fontSize: 10, fontStyle: 'bold'}},
-                                {content: 'MEIOS DE ENSINO', styles: {fontSize: 10, fontStyle: 'bold'}}
-                            ]],
-                            body: [
-                                [
-                                    {content: 'Introdução\n e Motivação', rowSpan: 2, styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}}
-                                ],
-                                [
-                                    {content: 'Mediação e Assimilação', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}}
-                                ]
-                            ],
-                            theme: 'grid',
-                            headStyles: {fillColor: [220, 220, 220], fontSize: 10, fontStyle: 'bold', font: 'times'},
-                            bodyStyles: {fontSize: 10, cellPadding: 3, font: 'times'},
-                            columnStyles: {
-                                0: {cellWidth: 20},
-                                1: {cellWidth: 25},
-                                2: {cellWidth: 25},
-                                3: {cellWidth: 25},
-                                4: {cellWidth: 25},
-                                5: {cellWidth: 25},
-                                6: {cellWidth: 25}
-                            },
-                            margin: {left: 10, right: 10}
+                        // Linha horizontal
+                        doc.setLineWidth(0.5);
+                        doc.line(20, rightY + 10, 277, rightY + 10);
+                        
+                        // Objectivos específicos
+                        let objY = rightY + 20;
+                        doc.setFont("times", "bold");
+                        doc.text("OBJECTIVOS ESPECÍFICOS:", 20, objY);
+                        doc.setFont("times", "normal");
+                        objY += 7;
+                        doc.text("• ___________________________________________________", 25, objY);
+                        objY += 7;
+                        doc.text("• ___________________________________________________", 25, objY);
+                        objY += 7;
+                        doc.text("• ___________________________________________________", 25, objY);
+                        
+                        // Linha horizontal
+                        doc.setLineWidth(0.5);
+                        doc.line(20, objY + 10, 277, objY + 10);
+                        
+                        // TABELA PRINCIPAL - Página 1
+                        const tableY = objY + 15;
+                        
+                        // Configurar larguras das colunas para ocupar toda a página
+                        const colWidths = [25, 40, 35, 40, 40, 35, 40];
+                        const totalWidth = colWidths.reduce((a, b) => a + b, 0);
+                        const scaleFactor = 267 / totalWidth; // 277-10 de margens
+                        const scaledWidths = colWidths.map(w => w * scaleFactor);
+                        
+                        // Cabeçalho da tabela
+                        doc.setFont("times", "bold");
+                        doc.setFontSize(11);
+                        
+                        let xPos = 15;
+                        const headerY = tableY;
+                        
+                        // Desenhar cabeçalho da tabela
+                        const headers = ["TEMPO", "FUNÇÕES DIDÁCTICAS", "CONTEÚDOS", "ACTIVIDADES DO PROFESSOR", "ACTIVIDADES DOS ALUNOS", "MÉTODOS DE ENSINO", "MEIOS DE ENSINO"];
+                        
+                        headers.forEach((header, index) => {
+                            // Fundo do cabeçalho
+                            doc.setFillColor(240, 240, 240);
+                            doc.rect(xPos, headerY, scaledWidths[index], 10, 'F');
+                            
+                            // Borda
+                            doc.setDrawColor(0, 0, 0);
+                            doc.setLineWidth(0.2);
+                            doc.rect(xPos, headerY, scaledWidths[index], 10);
+                            
+                            // Texto
+                            const textX = xPos + 2;
+                            const textY = headerY + 7;
+                            doc.text(header, textX, textY);
+                            
+                            xPos += scaledWidths[index];
                         });
                         
-                        // Página par - Parte 2 do plano de aula
-                        doc.addPage();
+                        // Linha 1: Introdução e Motivação
+                        const row1Y = headerY + 10;
+                        xPos = 15;
                         
-                        // NÃO ADICIONAR BORDA - Removido código de borda
+                        // Coluna TEMPO
+                        doc.setFillColor(255, 255, 255);
+                        doc.rect(xPos, row1Y, scaledWidths[0], 20, 'F');
+                        doc.rect(xPos, row1Y, scaledWidths[0], 20);
+                        doc.setFont("times", "bold");
+                        doc.setFontSize(10);
+                        const lines1 = doc.splitTextToSize("Introdução e Motivação", scaledWidths[0] - 4);
+                        doc.text(lines1, xPos + 2, row1Y + 7);
+                        xPos += scaledWidths[0];
                         
-                        // Continuar tabela
-                        const lastAutoTable = doc.autoTable.previous;
-                        let startY = 20;
-                        
-                        if (lastAutoTable && lastAutoTable.finalY) {
-                            startY = lastAutoTable.finalY + 10;
+                        // Outras colunas (vazias)
+                        for (let j = 1; j < 7; j++) {
+                            doc.setFillColor(255, 255, 255);
+                            doc.rect(xPos, row1Y, scaledWidths[j], 20, 'F');
+                            doc.rect(xPos, row1Y, scaledWidths[j], 20);
+                            doc.setFont("times", "normal");
+                            doc.setFontSize(10);
+                            doc.text("___________________", xPos + 2, row1Y + 7);
+                            xPos += scaledWidths[j];
                         }
                         
-                        doc.autoTable({
-                            startY: startY,
-                            head: [[
-                                {content: 'TEMPO', styles: {fontSize: 10, fontStyle: 'bold'}},
-                                {content: 'FUNÇÕES DIDÁCTICAS', styles: {fontSize: 10, fontStyle: 'bold'}},
-                                {content: 'CONTEÚDOS', styles: {fontSize: 10, fontStyle: 'bold'}},
-                                {content: 'ACTIVIDADES DO PROFESSOR', styles: {fontSize: 10, fontStyle: 'bold'}},
-                                {content: 'ACTIVIDADES DOS ALUNOS', styles: {fontSize: 10, fontStyle: 'bold'}},
-                                {content: 'MÉTODOS DE ENSINO', styles: {fontSize: 10, fontStyle: 'bold'}},
-                                {content: 'MEIOS DE ENSINO', styles: {fontSize: 10, fontStyle: 'bold'}}
-                            ]],
-                            body: [
-                                [
-                                    {content: 'Domínio\ne Consolidação', rowSpan: 2, styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}}
-                                ],
-                                [
-                                    {content: 'Controlo e Avaliação', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}},
-                                    {content: '___________________', styles: {fontSize: 10}}
-                                ]
-                            ],
-                            theme: 'grid',
-                            headStyles: {fillColor: [220, 220, 220], fontSize: 10, fontStyle: 'bold', font: 'times'},
-                            bodyStyles: {fontSize: 10, cellPadding: 3, font: 'times'},
-                            columnStyles: {
-                                0: {cellWidth: 20},
-                                1: {cellWidth: 25},
-                                2: {cellWidth: 25},
-                                3: {cellWidth: 25},
-                                4: {cellWidth: 25},
-                                5: {cellWidth: 25},
-                                6: {cellWidth: 25}
-                            },
-                            margin: {left: 10, right: 10}
-                        });
+                        // Linha 2: Mediação e Assimilação
+                        const row2Y = row1Y + 20;
+                        xPos = 15;
                         
-                        // Quadro Moral
-                        const lastAutoTable2 = doc.autoTable.previous;
-                        let finalY2 = lastAutoTable2 ? lastAutoTable2.finalY : 20;
-                        
-                        doc.setFontSize(12);
+                        // Coluna TEMPO
+                        doc.setFillColor(255, 255, 255);
+                        doc.rect(xPos, row2Y, scaledWidths[0], 20, 'F');
+                        doc.rect(xPos, row2Y, scaledWidths[0], 20);
                         doc.setFont("times", "bold");
-                        doc.text("ANEXO / QUADRO MORAL", 148, finalY2 + 15, { align: "center" });
-                        
                         doc.setFontSize(10);
-                        doc.setFont("times", "normal");
-                        doc.text("Espaço para anotações e observações adicionais sobre a aula.", 148, finalY2 + 25, { align: "center" });
+                        const lines2 = doc.splitTextToSize("Mediação e Assimilação", scaledWidths[0] - 4);
+                        doc.text(lines2, xPos + 2, row2Y + 7);
+                        xPos += scaledWidths[0];
                         
-                        // Rodapé com numeração de páginas
-                        doc.setFontSize(8);
-                        doc.text(`Página ${(i-1)*2 + 3} de ${dados.numAulas * 2 + 2} | Aula ${i} - Página 1/2`, 148, 195, { align: "center" });
+                        // Outras colunas (vazias)
+                        for (let j = 1; j < 7; j++) {
+                            doc.setFillColor(255, 255, 255);
+                            doc.rect(xPos, row2Y, scaledWidths[j], 20, 'F');
+                            doc.rect(xPos, row2Y, scaledWidths[j], 20);
+                            doc.setFont("times", "normal");
+                            doc.setFontSize(10);
+                            doc.text("___________________", xPos + 2, row2Y + 7);
+                            xPos += scaledWidths[j];
+                        }
                         
-                        doc.setPage(i*2 + 2);
-                        doc.text(`Página ${(i-1)*2 + 4} de ${dados.numAulas * 2 + 2} | Aula ${i} - Página 2/2`, 148, 195, { align: "center" });
+                        // Rodapé da página 1
+                        doc.setFontSize(10);
+                        doc.text(`Aula ${i} – Página 1/2`, 148, 190, { align: "center" });
+                        
+                        // PÁGINA 2 DA AULA - Layout conforme imagem 2
+                        doc.addPage();
+                        
+                        // Continuar tabela da página anterior
+                        const row3Y = 20;
+                        xPos = 15;
+                        
+                        // Linha 3: Domínio e Consolidação
+                        // Coluna TEMPO
+                        doc.setFillColor(255, 255, 255);
+                        doc.rect(xPos, row3Y, scaledWidths[0], 20, 'F');
+                        doc.rect(xPos, row3Y, scaledWidths[0], 20);
+                        doc.setFont("times", "bold");
+                        doc.setFontSize(10);
+                        const lines3 = doc.splitTextToSize("Domínio e Consolidação", scaledWidths[0] - 4);
+                        doc.text(lines3, xPos + 2, row3Y + 7);
+                        xPos += scaledWidths[0];
+                        
+                        // Outras colunas (vazias)
+                        for (let j = 1; j < 7; j++) {
+                            doc.setFillColor(255, 255, 255);
+                            doc.rect(xPos, row3Y, scaledWidths[j], 20, 'F');
+                            doc.rect(xPos, row3Y, scaledWidths[j], 20);
+                            doc.setFont("times", "normal");
+                            doc.setFontSize(10);
+                            doc.text("___________________", xPos + 2, row3Y + 7);
+                            xPos += scaledWidths[j];
+                        }
+                        
+                        // Linha 4: Controlo e Avaliação
+                        const row4Y = row3Y + 20;
+                        xPos = 15;
+                        
+                        // Coluna TEMPO
+                        doc.setFillColor(255, 255, 255);
+                        doc.rect(xPos, row4Y, scaledWidths[0], 20, 'F');
+                        doc.rect(xPos, row4Y, scaledWidths[0], 20);
+                        doc.setFont("times", "bold");
+                        doc.setFontSize(10);
+                        const lines4 = doc.splitTextToSize("Controlo e Avaliação", scaledWidths[0] - 4);
+                        doc.text(lines4, xPos + 2, row4Y + 7);
+                        xPos += scaledWidths[0];
+                        
+                        // Outras colunas (vazias)
+                        for (let j = 1; j < 7; j++) {
+                            doc.setFillColor(255, 255, 255);
+                            doc.rect(xPos, row4Y, scaledWidths[j], 20, 'F');
+                            doc.rect(xPos, row4Y, scaledWidths[j], 20);
+                            doc.setFont("times", "normal");
+                            doc.setFontSize(10);
+                            doc.text("___________________", xPos + 2, row4Y + 7);
+                            xPos += scaledWidths[j];
+                        }
+                        
+                        // ANEXO / QUADRO MORAL
+                        const quadroY = row4Y + 30;
+                        doc.setFontSize(16);
+                        doc.setFont("times", "bold");
+                        doc.text("ANEXO / QUADRO MORAL", 148, quadroY, { align: "center" });
+                        
+                        // Rodapé da página 2
+                        doc.setFontSize(10);
+                        doc.text(`Aula ${i} - Página 2/2`, 148, 190, { align: "center" });
                     }
                     
                     // Salvar referência do PDF
                     pdfDoc = doc;
                     pdfGenerated = true;
                     
+                    // Completar a geração
+                    completeGeneration();
+                    
                 } catch (error) {
                     console.error("Erro ao gerar PDF:", error);
-                    alert("Ocorreu um erro ao gerar o PDF. Por favor, tente novamente.");
+                    showStatus("Erro no Processo", "Ocorreu um erro ao gerar o PDF.");
+                    setTimeout(() => {
+                        processingOverlay.classList.remove('active');
+                        mainContainer.classList.remove('blurred');
+                        loadingSection.classList.remove('hidden');
+                        generatePdfBtn.disabled = false;
+                        generatePdfBtn.textContent = "Tentar Novamente";
+                    }, 2000);
                 }
             }
             
