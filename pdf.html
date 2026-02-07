@@ -679,7 +679,7 @@
                 });
             }
             
-            // Função para gerar o PDF - COM TABELA AJUSTADA
+            // Função para gerar o PDF
             async function generatePDF(dados, dataFormatada) {
                 try {
                     const { jsPDF } = window.jspdf;
@@ -801,7 +801,7 @@
                     doc.setFontSize(10);
                     doc.text(`Data: ${dataFormatada}`, 148, 185, { align: "center" });
                     
-                    // ===== PÁGINAS DE PLANO DE AULA - TABELA AJUSTADA =====
+                    // ===== PÁGINAS DE PLANO DE AULA =====
                     for (let i = 1; i <= dados.numAulas; i++) {
                         // PÁGINA 1 DA AULA
                         doc.addPage();
@@ -867,17 +867,15 @@
                         objY += 6;
                         doc.text("3. Afetivo: ___________________________________________________", 25, objY);
                         
-                        // TABELA PRINCIPAL - Página 1 (AJUSTADA PARA NÃO CORTAR)
+                        // TABELA PRINCIPAL - Página 1
                         const tableY = objY + 10;
                         
                         // Configurar larguras das colunas otimizadas
-                        const colWidths = [20, 35, 32, 35, 35, 32, 35];
+                        const colWidths = [18, 31.5, 28.8, 31.5, 31.5, 28.8, 31.5];
                         const totalWidth = colWidths.reduce((a, b) => a + b, 0);
-                        const scaleFactor = 250 / totalWidth;
-                        const scaledWidths = colWidths.map(w => w * scaleFactor);
                         
                         // Posição inicial da tabela (centralizada)
-                        const tableStartX = (297 - 250) / 2;
+                        const tableStartX = (297 - totalWidth) / 2;
                         
                         // Cabeçalho da tabela
                         doc.setFont("times", "bold");
@@ -890,75 +888,75 @@
                         
                         headers.forEach((header, index) => {
                             doc.setFillColor(240, 240, 240);
-                            doc.rect(xPos, headerY, scaledWidths[index], 12, 'F');
+                            doc.rect(xPos, headerY, colWidths[index], 12, 'F');
                             doc.setDrawColor(0, 0, 0);
                             doc.setLineWidth(0.2);
-                            doc.rect(xPos, headerY, scaledWidths[index], 12);
+                            doc.rect(xPos, headerY, colWidths[index], 12);
                             
-                            const lines = doc.splitTextToSize(header, scaledWidths[index] - 4);
+                            const lines = doc.splitTextToSize(header, colWidths[index] - 4);
                             let textY = headerY + 4;
                             lines.forEach((line, lineIndex) => {
                                 doc.text(line, xPos + 2, textY + (lineIndex * 4));
                             });
-                            xPos += scaledWidths[index];
+                            xPos += colWidths[index];
                         });
                         
-                        // Linha 1: Introdução e Motivação
+                        // Linha 1: Introdução e Motivação (PADRÃO EM TODAS AS PLANILHAS)
                         const row1Y = headerY + 12;
                         xPos = tableStartX;
                         
                         // Coluna TEMPO
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row1Y, scaledWidths[0], 45, 'F');
-                        doc.rect(xPos, row1Y, scaledWidths[0], 45);
-                        xPos += scaledWidths[0];
+                        doc.rect(xPos, row1Y, colWidths[0], 45, 'F');
+                        doc.rect(xPos, row1Y, colWidths[0], 45);
+                        xPos += colWidths[0];
                         
                         // Coluna FUNÇÕES DIDÁCTICAS
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row1Y, scaledWidths[1], 45, 'F');
-                        doc.rect(xPos, row1Y, scaledWidths[1], 45);
+                        doc.rect(xPos, row1Y, colWidths[1], 45, 'F');
+                        doc.rect(xPos, row1Y, colWidths[1], 45);
                         doc.setFont("times", "bold");
-                        doc.setFontSize(12);
+                        doc.setFontSize(11);
                         doc.text("Introdução", xPos + 5, row1Y + 15);
                         doc.text("e", xPos + 5, row1Y + 25);
                         doc.text("Motivação", xPos + 5, row1Y + 35);
-                        xPos += scaledWidths[1];
+                        xPos += colWidths[1];
                         
-                        // Outras colunas
+                        // Outras colunas (vazias)
                         for (let j = 2; j < 7; j++) {
                             doc.setFillColor(255, 255, 255);
-                            doc.rect(xPos, row1Y, scaledWidths[j], 45, 'F');
-                            doc.rect(xPos, row1Y, scaledWidths[j], 45);
-                            xPos += scaledWidths[j];
+                            doc.rect(xPos, row1Y, colWidths[j], 45, 'F');
+                            doc.rect(xPos, row1Y, colWidths[j], 45);
+                            xPos += colWidths[j];
                         }
                         
-                        // Linha 2: Mediação e Assimilação
+                        // Linha 2: Mediação e Assimilação (PADRÃO EM TODAS AS PLANILHAS)
                         const row2Y = row1Y + 45;
                         xPos = tableStartX;
                         
                         // Coluna TEMPO
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row2Y, scaledWidths[0], 45, 'F');
-                        doc.rect(xPos, row2Y, scaledWidths[0], 45);
-                        xPos += scaledWidths[0];
+                        doc.rect(xPos, row2Y, colWidths[0], 45, 'F');
+                        doc.rect(xPos, row2Y, colWidths[0], 45);
+                        xPos += colWidths[0];
                         
                         // Coluna FUNÇÕES DIDÁCTICAS
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row2Y, scaledWidths[1], 45, 'F');
-                        doc.rect(xPos, row2Y, scaledWidths[1], 45);
+                        doc.rect(xPos, row2Y, colWidths[1], 45, 'F');
+                        doc.rect(xPos, row2Y, colWidths[1], 45);
                         doc.setFont("times", "bold");
-                        doc.setFontSize(12);
+                        doc.setFontSize(11);
                         doc.text("Mediação", xPos + 5, row2Y + 15);
                         doc.text("e", xPos + 5, row2Y + 25);
                         doc.text("Assimilação", xPos + 5, row2Y + 35);
-                        xPos += scaledWidths[1];
+                        xPos += colWidths[1];
                         
-                        // Outras colunas
+                        // Outras colunas (vazias)
                         for (let j = 2; j < 7; j++) {
                             doc.setFillColor(255, 255, 255);
-                            doc.rect(xPos, row2Y, scaledWidths[j], 45, 'F');
-                            doc.rect(xPos, row2Y, scaledWidths[j], 45);
-                            xPos += scaledWidths[j];
+                            doc.rect(xPos, row2Y, colWidths[j], 45, 'F');
+                            doc.rect(xPos, row2Y, colWidths[j], 45);
+                            xPos += colWidths[j];
                         }
                         
                         // PÁGINA 2 DA AULA
@@ -973,53 +971,53 @@
                         const row3Y = 25;
                         xPos = tableStartX;
                         
-                        // Linha 3: Domínio e Consolidação
+                        // Linha 3: Domínio e Consolidação (PADRÃO EM TODAS AS PLANILHAS)
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row3Y, scaledWidths[0], 45, 'F');
-                        doc.rect(xPos, row3Y, scaledWidths[0], 45);
-                        xPos += scaledWidths[0];
+                        doc.rect(xPos, row3Y, colWidths[0], 45, 'F');
+                        doc.rect(xPos, row3Y, colWidths[0], 45);
+                        xPos += colWidths[0];
                         
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row3Y, scaledWidths[1], 45, 'F');
-                        doc.rect(xPos, row3Y, scaledWidths[1], 45);
+                        doc.rect(xPos, row3Y, colWidths[1], 45, 'F');
+                        doc.rect(xPos, row3Y, colWidths[1], 45);
                         doc.setFont("times", "bold");
-                        doc.setFontSize(12);
+                        doc.setFontSize(11);
                         doc.text("Domínio", xPos + 5, row3Y + 15);
                         doc.text("e", xPos + 5, row3Y + 25);
                         doc.text("Consolidação", xPos + 5, row3Y + 35);
-                        xPos += scaledWidths[1];
+                        xPos += colWidths[1];
                         
                         for (let j = 2; j < 7; j++) {
                             doc.setFillColor(255, 255, 255);
-                            doc.rect(xPos, row3Y, scaledWidths[j], 45, 'F');
-                            doc.rect(xPos, row3Y, scaledWidths[j], 45);
-                            xPos += scaledWidths[j];
+                            doc.rect(xPos, row3Y, colWidths[j], 45, 'F');
+                            doc.rect(xPos, row3Y, colWidths[j], 45);
+                            xPos += colWidths[j];
                         }
                         
-                        // Linha 4: Controlo e Avaliação
+                        // Linha 4: Controlo e Avaliação (PADRÃO EM TODAS AS PLANILHAS)
                         const row4Y = row3Y + 45;
                         xPos = tableStartX;
                         
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row4Y, scaledWidths[0], 45, 'F');
-                        doc.rect(xPos, row4Y, scaledWidths[0], 45);
-                        xPos += scaledWidths[0];
+                        doc.rect(xPos, row4Y, colWidths[0], 45, 'F');
+                        doc.rect(xPos, row4Y, colWidths[0], 45);
+                        xPos += colWidths[0];
                         
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row4Y, scaledWidths[1], 45, 'F');
-                        doc.rect(xPos, row4Y, scaledWidths[1], 45);
+                        doc.rect(xPos, row4Y, colWidths[1], 45, 'F');
+                        doc.rect(xPos, row4Y, colWidths[1], 45);
                         doc.setFont("times", "bold");
-                        doc.setFontSize(12);
+                        doc.setFontSize(11);
                         doc.text("Controlo", xPos + 5, row4Y + 15);
                         doc.text("e", xPos + 5, row4Y + 25);
                         doc.text("Avaliação", xPos + 5, row4Y + 35);
-                        xPos += scaledWidths[1];
+                        xPos += colWidths[1];
                         
                         for (let j = 2; j < 7; j++) {
                             doc.setFillColor(255, 255, 255);
-                            doc.rect(xPos, row4Y, scaledWidths[j], 45, 'F');
-                            doc.rect(xPos, row4Y, scaledWidths[j], 45);
-                            xPos += scaledWidths[j];
+                            doc.rect(xPos, row4Y, colWidths[j], 45, 'F');
+                            doc.rect(xPos, row4Y, colWidths[j], 45);
+                            xPos += colWidths[j];
                         }
                         
                         // QUADRO MURAL
