@@ -1,98 +1,12 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html>
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pré-visualização - Bloco Não Pago</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: #f9f9f9;
-        }
-
-        .page {
-            position: relative;
-            width: 21cm;
-            min-height: 29.7cm;
-            background: white;
-            margin: 0 auto 30px;
-            padding: 25px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border: 1px solid #eee;
-        }
-
-        /* Marca d'água */
-        .watermark {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .watermark-text {
-            font-size: 48px;
-            font-weight: bold;
-            color: rgba(255, 0, 0, 0.15);
-            transform: rotate(-45deg);
-            white-space: nowrap;
-            letter-spacing: 4px;
-        }
-
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-
-        .info {
-            margin-bottom: 15px;
-        }
-
-        .info strong {
-            color: #3498db;
-        }
-    </style>
+    <title>Redirecionando...</title>
+    <meta http-equiv="refresh" content="0;url=https://drive.google.com/file/d/1y4ttysCXSXK1lo2LwmubLmYi0KqqeuWl/view?usp=drivesdk" />
 </head>
 <body>
-    <div class="page">
-        <div class="watermark">
-            <div class="watermark-text">BLOCO NÃO PAGO</div>
-        </div>
-
-        <h1>Bloco de Planificação Pedagógica</h1>
-        <div class="info"><strong>Escola:</strong> <span id="previewEscola">—</span></div>
-        <div class="info"><strong>Professor:</strong> <span id="previewProfessor">—</span></div>
-        <div class="info"><strong>Disciplina:</strong> <span id="previewDisciplina">—</span></div>
-        <div class="info"><strong>Classe:</strong> <span id="previewClasse">—</span></div>
-        <div class="info"><strong>Ano Lectivo:</strong> <span id="previewAno">—</span></div>
-        <div class="info"><strong>Número de Aulas:</strong> <span id="previewAulas">—</span></div>
-        <div class="info"><strong>Data de Geração:</strong> <span id="previewData">—</span></div>
-        <div class="info"><strong>Período:</strong> <span id="previewPeriodo">—</span></div>
-
-        <p style="margin-top: 30px; color: #777;">
-            Este é um exemplo de pré-visualização. O PDF final terá o mesmo layout, mas sem a marca d'água após pagamento.
-        </p>
-    </div>
-
-    <script>
-        // Ler parâmetros da URL
-        const urlParams = new URLSearchParams(window.location.search);
-        document.getElementById('previewEscola').textContent = urlParams.get('escola') || '—';
-        document.getElementById('previewProfessor').textContent = urlParams.get('professor') || '—';
-        document.getElementById('previewDisciplina').textContent = urlParams.get('disciplina') || '—';
-        document.getElementById('previewClasse').textContent = urlParams.get('classe') || '—';
-        document.getElementById('previewAno').textContent = urlParams.get('anoLectivo') || '—';
-        document.getElementById('previewAulas').textContent = urlParams.get('numAulas') ? 
-            urlParams.get('numAulas') + ' aulas' : '—';
-        document.getElementById('previewData').textContent = urlParams.get('dataGeracao') || '—';
-        document.getElementById('previewPeriodo').textContent = urlParams.get('periodo') || '—';
-    </script>
+    Redirecionando para a pré-visualização... 
+    <a href="https://drive.google.com/file/d/1y4ttysCXSXK1lo2LwmubLmYi0KqqeuWl/view?usp=drivesdk">Clique aqui se não for redirecionado.</a>
 </body>
 </html>
