@@ -809,17 +809,17 @@
                         // Paginação no canto superior direito
                         doc.setFontSize(9);
                         doc.setFont("times", "normal");
-                        doc.text(`Aula ${i} - Página 1/2`, 260, 15, { align: "right" });
+                        doc.text(`Aula ${i} - Página 1/2`, 270, 12, { align: "right" });
                         
                         doc.setFontSize(20);
                         doc.setFont("times", "bold");
-                        doc.text("PLANO DE AULA", 148, 25, { align: "center" });
+                        doc.text("PLANO DE AULA", 148, 22, { align: "center" });
                         
                         doc.setFontSize(12);
                         doc.setFont("times", "normal");
                         
-                        // Coluna esquerda - informações atualizadas
-                        let leftY = 35;
+                        // Coluna esquerda - COM TEMA AUMENTADO PARA MELHOR ESCRITA MANUAL
+                        let leftY = 30;
                         doc.text(`Escola: ${dados.escola || "___________________"}`, 15, leftY);
                         leftY += 6;
                         doc.text(`Data: __________/__________/__________`, 15, leftY);
@@ -830,33 +830,34 @@
                         leftY += 6;
                         doc.text(`Unidade Temática: ___________________`, 15, leftY);
                         leftY += 6;
-                        doc.text(`Tema: ___________________________________`, 15, leftY);
-                        leftY += 8; // Espaço de uma linha entre tema e objetivo geral
+                        // TRAÇO DO TEMA AUMENTADO PARA MELHOR ESCRITA MANUAL
+                        doc.text(`Tema: _____________________________________________________________`, 15, leftY);
+                        leftY += 8;
                         
                         // Objetivo Geral com traço em negrito
                         doc.setFont("times", "bold");
                         doc.text(`Objectivo Geral: ________________________________________`, 15, leftY);
                         leftY += 10;
                         
-                        // Coluna direita - informações atualizadas
-                        let rightY = 41;
+                        // Coluna direita - AFASTADA PARA MARGEM DIREITA
+                        let rightY = 30;
                         doc.setFont("times", "bold");
-                        doc.text(`Classe: ${dados.classe || "__________"}`, 155, rightY);
+                        doc.text(`Classe: ${dados.classe || "__________"}`, 170, rightY);
                         doc.setFont("times", "normal");
                         rightY += 6;
-                        doc.text(`Turma: __________`, 155, rightY);
+                        doc.text(`Turma: __________`, 170, rightY);
                         rightY += 6;
-                        doc.text(`Lição nº: _____`, 155, rightY);
+                        doc.text(`Lição nº: _____`, 170, rightY);
                         rightY += 6;
-                        doc.text(`Duração: __________`, 155, rightY);
+                        doc.text(`Duração: __________`, 170, rightY);
                         rightY += 6;
-                        doc.text(`Período: ${dados.periodo || "__________"}`, 155, rightY);
+                        doc.text(`Período: ${dados.periodo || "__________"}`, 170, rightY);
                         rightY += 6;
-                        doc.text(`Tipo de Aula: __________`, 155, rightY);
+                        doc.text(`Tipo de Aula: __________`, 170, rightY);
                         rightY += 6;
-                        doc.text(`Número de alunos: __________`, 155, rightY);
+                        doc.text(`Número de alunos: __________`, 170, rightY);
                         
-                        // Objectivos específicos atualizados
+                        // Objectivos específicos
                         let objY = Math.max(leftY, rightY) + 5;
                         doc.setFont("times", "bold");
                         doc.text("OBJECTIVOS ESPECÍFICOS:", 15, objY);
@@ -868,7 +869,7 @@
                         objY += 6;
                         doc.text("3. Afetivo: ___________________________________________________", 20, objY);
                         
-                        // TABELA PRINCIPAL - Página 1 (começa mais cedo)
+                        // TABELA PRINCIPAL - Página 1
                         const tableY = objY + 10;
                         
                         // Configurar larguras das colunas otimizadas
@@ -971,7 +972,7 @@
                         // Paginação no canto superior direito
                         doc.setFontSize(9);
                         doc.setFont("times", "normal");
-                        doc.text(`Aula ${i} - Página 2/2`, 260, 15, { align: "right" });
+                        doc.text(`Aula ${i} - Página 2/2`, 270, 12, { align: "right" });
                         
                         // Continuar tabela
                         const row3Y = 25;
