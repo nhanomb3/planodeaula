@@ -168,6 +168,17 @@
             box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
         }
         
+        .warning-btn {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+        }
+        
+        .warning-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+        }
+        
         .info-box {
             background-color: #f8f9fa;
             border: 1px solid #e9ecef;
@@ -323,9 +334,126 @@
             max-width: 300px;
             box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
         }
+        
+        /* Modal de confirmação do Quadro Mural */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .modal h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        
+        .modal p {
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .modal-cost {
+            background: linear-gradient(135deg, #ffd166, #ffb347);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+        
+        .modal-btn {
+            padding: 12px 25px;
+            min-width: 120px;
+        }
+        
+        .price-tag {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        
+        .cost-summary {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #27ae60;
+        }
     </style>
 </head>
 <body>
+    <!-- Modal de confirmação do Quadro Mural -->
+    <div id="muralModal" class="modal-overlay">
+        <div class="modal">
+            <h3>📋 Adicionar Página de Quadro Mural?</h3>
+            <p>Deseja adicionar uma página especial de <strong>Quadro Mural pautado</strong> para cada aula?</p>
+            <p>Esta página inclui áreas pautadas para:</p>
+            <ul style="text-align: left; margin: 15px 0; padding-left: 20px;">
+                <li>Explicação do tema</li>
+                <li>Exercícios</li>
+                <li>TPC (Trabalho Para Casa)</li>
+            </ul>
+            
+            <div class="modal-cost">
+                📝 Custo adicional: <span id="additionalCost">0</span> MZN<br>
+                <small>(2 MZN por página × <span id="muralPagesCount">0</span> páginas)</small>
+            </div>
+            
+            <div class="cost-summary">
+                <p><strong>Resumo:</strong></p>
+                <p>Total de páginas: <span id="totalPagesWithout">0</span> → <span id="totalPagesWith">0</span></p>
+                <p>Total de aulas: <span id="totalAulasCount">0</span></p>
+            </div>
+            
+            <div class="modal-buttons">
+                <button id="confirmMuralBtn" class="btn success-btn">Sim, Adicionar</button>
+                <button id="cancelMuralBtn" class="btn secondary-btn">Não, Obrigado</button>
+            </div>
+            
+            <p style="margin-top: 15px; font-size: 14px; color: #7f8c8d;">
+                Você poderá escrever diretamente no PDF impresso com espaçamento adequado para escrita manual.
+            </p>
+        </div>
+    </div>
+    
     <div id="processingOverlay" class="processing-overlay">
         <div class="spinner-container">
             <div class="spinner"></div>
@@ -378,7 +506,13 @@
         <div id="successSection" class="hidden">
             <div class="success-message">
                 <h2>✅ PDF Gerado com Sucesso!</h2>
-                <p>Seu bloco de planificação está pronto para download.</p>
+                <p id="successMessage">Seu bloco de planificação está pronto para download.</p>
+                <div id="costInfo" class="cost-summary hidden">
+                    <p><strong>Informações do PDF:</strong></p>
+                    <p>Total de páginas: <span id="finalPageCount">0</span></p>
+                    <p>Páginas de Quadro Mural: <span id="finalMuralCount">0</span></p>
+                    <p>Custo adicional: <span id="finalCost">0</span> MZN</p>
+                </div>
             </div>
             
             <div class="btn-group">
@@ -429,6 +563,19 @@
             const infoContainer = document.getElementById('infoContainer');
             const countdownTimer = document.getElementById('countdownTimer');
             const countdownDisplay = document.getElementById('countdownDisplay');
+            const muralModal = document.getElementById('muralModal');
+            const confirmMuralBtn = document.getElementById('confirmMuralBtn');
+            const cancelMuralBtn = document.getElementById('cancelMuralBtn');
+            const additionalCost = document.getElementById('additionalCost');
+            const muralPagesCount = document.getElementById('muralPagesCount');
+            const totalPagesWithout = document.getElementById('totalPagesWithout');
+            const totalPagesWith = document.getElementById('totalPagesWith');
+            const totalAulasCount = document.getElementById('totalAulasCount');
+            const successMessage = document.getElementById('successMessage');
+            const costInfo = document.getElementById('costInfo');
+            const finalPageCount = document.getElementById('finalPageCount');
+            const finalMuralCount = document.getElementById('finalMuralCount');
+            const finalCost = document.getElementById('finalCost');
             
             // Elementos dos estágios
             const stage1 = document.getElementById('stage1');
@@ -493,6 +640,12 @@
             const totalUpdates = totalProcessingTime / updateInterval;
             const percentagePerUpdate = 100 / totalUpdates;
             
+            // Variável para controle do Quadro Mural
+            let incluirQuadroMural = false;
+            let custoAdicional = 0;
+            let totalPaginas = 0;
+            let paginasMural = 0;
+            
             // Atualizar a porcentagem no círculo
             function updatePercentage(percentage) {
                 currentPercentage = Math.min(percentage, 100);
@@ -538,6 +691,30 @@
                 if (submessage) statusSubtext.textContent = submessage;
             }
             
+            // Atualizar informações do modal do Quadro Mural
+            function atualizarInformacoesMural() {
+                const paginasSemMural = 2 + (dados.numAulas * 2); // Capa + Declaração + (2 páginas por aula)
+                const paginasComMural = 2 + (dados.numAulas * 3); // Capa + Declaração + (3 páginas por aula)
+                custoAdicional = dados.numAulas * 2; // 2 MZN por página de mural
+                
+                additionalCost.textContent = custoAdicional;
+                muralPagesCount.textContent = dados.numAulas;
+                totalPagesWithout.textContent = paginasSemMural;
+                totalPagesWith.textContent = paginasComMural;
+                totalAulasCount.textContent = dados.numAulas;
+            }
+            
+            // Mostrar modal de confirmação do Quadro Mural
+            function mostrarModalMural() {
+                atualizarInformacoesMural();
+                muralModal.classList.add('active');
+            }
+            
+            // Fechar modal do Quadro Mural
+            function fecharModalMural() {
+                muralModal.classList.remove('active');
+            }
+            
             // Iniciar contagem regressiva inicial
             function startAutoCountdown() {
                 let secondsLeft = countdownTime / 1000;
@@ -549,7 +726,7 @@
                     
                     if (secondsLeft <= 0) {
                         clearInterval(autoStartCountdown);
-                        startGenerationProcess();
+                        mostrarModalMural(); // Mostrar modal em vez de iniciar direto
                     }
                 }, 1000);
             }
@@ -572,10 +749,109 @@
                 }, 1000);
             }
             
+            // Função para adicionar página de Quadro Mural
+            function adicionarPaginaQuadroMural(doc, numeroAula) {
+                doc.addPage();
+                
+                // Cabeçalho com paginação
+                doc.setFontSize(9);
+                doc.setFont("times", "normal");
+                doc.text(`Aula ${numeroAula} - Página 3/3`, 270, 12, { align: "right" });
+                
+                // Título
+                doc.setFontSize(20);
+                doc.setFont("times", "bold");
+                doc.text("QUADRO MURAL", 148, 22, { align: "center" });
+                
+                // Configurações para o quadro pautado
+                const marginLeft = 15;
+                const marginRight = 15;
+                const marginTop = 35;
+                const marginBottom = 15;
+                const usableWidth = 297 - marginLeft - marginRight;
+                const lineSpacing = 7.5; // 7.5mm entre linhas
+                
+                // Desenhar borda da página
+                doc.setLineWidth(1.5);
+                doc.rect(marginLeft, marginTop, usableWidth, 210 - marginTop - marginBottom);
+                doc.setLineWidth(0.8);
+                doc.rect(marginLeft + 2, marginTop + 2, usableWidth - 4, 210 - marginTop - marginBottom - 4);
+                
+                let yPos = marginTop + 15;
+                
+                // 1. Explicação do tema
+                doc.setFontSize(16);
+                doc.setFont("times", "bold");
+                doc.text("1. Explicação do tema:", marginLeft + 10, yPos);
+                yPos += 10;
+                
+                // Área pautada para explicação do tema (160mm de altura)
+                const explicacaoHeight = 160;
+                for (let i = 0; i < explicacaoHeight / lineSpacing; i++) {
+                    doc.setLineWidth(0.2);
+                    doc.line(marginLeft + 10, yPos + (i * lineSpacing), marginLeft + usableWidth - 10, yPos + (i * lineSpacing));
+                }
+                
+                // Linha vertical leve na margem esquerda
+                doc.setLineWidth(0.5);
+                doc.line(marginLeft + 25, yPos, marginLeft + 25, yPos + explicacaoHeight - lineSpacing);
+                
+                yPos += explicacaoHeight + 15;
+                
+                // 2. Exercícios
+                doc.setFontSize(16);
+                doc.setFont("times", "bold");
+                doc.text("2. Exercícios:", marginLeft + 10, yPos);
+                yPos += 10;
+                
+                // Área pautada para exercícios (50mm de altura)
+                const exerciciosHeight = 50;
+                for (let i = 0; i < exerciciosHeight / lineSpacing; i++) {
+                    doc.setLineWidth(0.2);
+                    doc.line(marginLeft + 10, yPos + (i * lineSpacing), marginLeft + usableWidth - 10, yPos + (i * lineSpacing));
+                }
+                
+                // Linha vertical leve na margem esquerda
+                doc.setLineWidth(0.5);
+                doc.line(marginLeft + 25, yPos, marginLeft + 25, yPos + exerciciosHeight - lineSpacing);
+                
+                yPos += exerciciosHeight + 15;
+                
+                // 3. TPC
+                doc.setFontSize(16);
+                doc.setFont("times", "bold");
+                doc.text("3. TPC:", marginLeft + 10, yPos);
+                yPos += 10;
+                
+                // Área pautada para TPC (40mm de altura)
+                const tpcHeight = 40;
+                for (let i = 0; i < tpcHeight / lineSpacing; i++) {
+                    doc.setLineWidth(0.2);
+                    doc.line(marginLeft + 10, yPos + (i * lineSpacing), marginLeft + usableWidth - 10, yPos + (i * lineSpacing));
+                }
+                
+                // Linha vertical leve na margem esquerda
+                doc.setLineWidth(0.5);
+                doc.line(marginLeft + 25, yPos, marginLeft + 25, yPos + tpcHeight - lineSpacing);
+            }
+            
+            // Botões do modal
+            confirmMuralBtn.addEventListener('click', function() {
+                incluirQuadroMural = true;
+                fecharModalMural();
+                startGenerationProcess();
+            });
+            
+            cancelMuralBtn.addEventListener('click', function() {
+                incluirQuadroMural = false;
+                fecharModalMural();
+                startGenerationProcess();
+            });
+            
             // Iniciar o processo de geração
             generatePdfBtn.addEventListener('click', function() {
                 clearInterval(autoStartCountdown);
-                startGenerationProcess();
+                mostrarModalMural();
             });
             
             // Função para iniciar o processo de geração
@@ -633,7 +909,7 @@
                 
                 // Iniciar a geração do PDF após 1 segundo
                 setTimeout(() => {
-                    generatePDF(dados, dataFormatada);
+                    generatePDF(dados, dataFormatada, incluirQuadroMural);
                 }, 1000);
             }
             
@@ -642,6 +918,19 @@
                 // Garantir que a porcentagem seja 100%
                 updatePercentage(100);
                 showStatus("Processo Concluído!", "PDF gerado com sucesso!");
+                
+                // Atualizar mensagem de sucesso com informações
+                let message = "Seu bloco de planificação está pronto para download.";
+                if (incluirQuadroMural) {
+                    message += ` Inclui ${paginasMural} páginas de Quadro Mural pautado.`;
+                    costInfo.classList.remove('hidden');
+                    finalPageCount.textContent = totalPaginas;
+                    finalMuralCount.textContent = paginasMural;
+                    finalCost.textContent = custoAdicional;
+                } else {
+                    costInfo.classList.add('hidden');
+                }
+                successMessage.textContent = message;
                 
                 setTimeout(() => {
                     processingOverlay.classList.remove('active');
@@ -653,7 +942,11 @@
             // Botão para baixar PDF
             downloadPdfBtn.addEventListener('click', function() {
                 if (pdfDoc && pdfGenerated) {
-                    const fileName = `Bloco_Planificacao_${dados.professor.replace(/\s+/g, '_')}_${dados.numAulas}_Aulas.pdf`;
+                    let fileName = `Bloco_Planificacao_${dados.professor.replace(/\s+/g, '_')}_${dados.numAulas}_Aulas`;
+                    if (incluirQuadroMural) {
+                        fileName += `_com_Quadro_Mural`;
+                    }
+                    fileName += `.pdf`;
                     pdfDoc.save(fileName);
                 } else {
                     alert("PDF ainda não foi gerado. Por favor, aguarde.");
@@ -680,7 +973,7 @@
             }
             
             // Função para gerar o PDF
-            async function generatePDF(dados, dataFormatada) {
+            async function generatePDF(dados, dataFormatada, incluirMural) {
                 try {
                     const { jsPDF } = window.jspdf;
                     const doc = new jsPDF({
@@ -739,7 +1032,16 @@
                     doc.text(`PROFESSOR: ${dados.professor || "___________________"}`, 148, 110, { align: "center" });
                     doc.text(`DISCIPLINA: ${dados.disciplina || "___________________"}`, 148, 120, { align: "center" });
                     doc.text(`CLASSE: ${dados.classe || "___________________"}`, 148, 130, { align: "center" });
-                    doc.text(`BLOCO COM ${dados.numAulas} AULAS: ${dados.numAulas * 2} páginas`, 148, 140, { align: "center" });
+                    
+                    // Atualizar informação de páginas baseado na escolha do mural
+                    const paginasPorAula = incluirMural ? 3 : 2;
+                    const totalPaginasBloco = 2 + (dados.numAulas * paginasPorAula);
+                    doc.text(`BLOCO COM ${dados.numAulas} AULAS: ${totalPaginasBloco} páginas`, 148, 140, { align: "center" });
+                    
+                    // Salvar informações para exibir depois
+                    totalPaginas = totalPaginasBloco;
+                    paginasMural = incluirMural ? dados.numAulas : 0;
+                    custoAdicional = paginasMural * 2;
                     
                     doc.setFontSize(10);
                     doc.text(`Data de geração: ${dataFormatada}`, 148, 180, { align: "center" });
@@ -809,7 +1111,8 @@
                         // Paginação no canto superior direito
                         doc.setFontSize(9);
                         doc.setFont("times", "normal");
-                        doc.text(`Aula ${i} - Página 1/2`, 270, 12, { align: "right" });
+                        const paginacaoP1 = incluirMural ? `Aula ${i} - Página 1/3` : `Aula ${i} - Página 1/2`;
+                        doc.text(paginacaoP1, 270, 12, { align: "right" });
                         
                         doc.setFontSize(20);
                         doc.setFont("times", "bold");
@@ -972,7 +1275,8 @@
                         // Paginação no canto superior direito
                         doc.setFontSize(9);
                         doc.setFont("times", "normal");
-                        doc.text(`Aula ${i} - Página 2/2`, 270, 12, { align: "right" });
+                        const paginacaoP2 = incluirMural ? `Aula ${i} - Página 2/3` : `Aula ${i} - Página 2/2`;
+                        doc.text(paginacaoP2, 270, 12, { align: "right" });
                         
                         // Continuar tabela
                         const row3Y = 25;
@@ -1029,11 +1333,18 @@
                             xPos += scaledWidths[j];
                         }
                         
-                        // QUADRO MURAL
-                        const quadroY = row4Y + 50;
-                        doc.setFontSize(16);
-                        doc.setFont("times", "bold");
-                        doc.text("QUADRO MURAL", 148, quadroY, { align: "center" });
+                        // QUADRO MURAL (somente se não for adicionar página extra)
+                        if (!incluirMural) {
+                            const quadroY = row4Y + 50;
+                            doc.setFontSize(16);
+                            doc.setFont("times", "bold");
+                            doc.text("QUADRO MURAL", 148, quadroY, { align: "center" });
+                        }
+                        
+                        // SE INCLUIR MURAL, ADICIONAR PÁGINA 3
+                        if (incluirMural) {
+                            adicionarPaginaQuadroMural(doc, i);
+                        }
                     }
                     
                     pdfDoc = doc;
