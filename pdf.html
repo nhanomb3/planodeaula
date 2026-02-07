@@ -598,7 +598,7 @@
                         creator: 'Sistema de Geração de Blocos'
                     });
                     
-                    // ===== PÁGINA 1 =====
+                    // ===== PÁGINA 1 - CAPA =====
                     doc.setLineWidth(1.5);
                     doc.rect(10, 10, 277, 187);
                     doc.setLineWidth(0.8);
@@ -611,6 +611,11 @@
                     } catch (error) {
                         console.log('Imagem não carregada, continuando sem ela');
                     }
+                    
+                    // Configurar cor preta total (full black) para texto da capa
+                    doc.setDrawColor(0, 0, 0); // Preto total
+                    doc.setFillColor(0, 0, 0); // Preto total
+                    doc.setTextColor(0, 0, 0); // Preto total
                     
                     doc.setFontSize(18);
                     doc.setFont("times", "bold");
@@ -764,7 +769,7 @@
                         const scaleFactor = 267 / totalWidth;
                         const scaledWidths = colWidths.map(w => w * scaleFactor);
                         
-                        // Cabeçalho da tabela
+                        // Cabeçalho da tabela - FUNÇÃO DIDÁCTICA (sem quebra)
                         doc.setFont("times", "bold");
                         doc.setFontSize(10);
                         
@@ -794,60 +799,58 @@
                         
                         // Coluna TEMPO (vazia)
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row1Y, scaledWidths[0], 40, 'F');
-                        doc.rect(xPos, row1Y, scaledWidths[0], 40);
+                        doc.rect(xPos, row1Y, scaledWidths[0], 45, 'F');
+                        doc.rect(xPos, row1Y, scaledWidths[0], 45);
                         xPos += scaledWidths[0];
                         
-                        // Coluna FUNÇÕES DIDÁCTICAS (com texto formatado em 3 linhas)
+                        // Coluna FUNÇÕES DIDÁCTICAS (com texto formatado em 3 linhas, tamanho 12)
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row1Y, scaledWidths[1], 40, 'F');
-                        doc.rect(xPos, row1Y, scaledWidths[1], 40);
+                        doc.rect(xPos, row1Y, scaledWidths[1], 45, 'F');
+                        doc.rect(xPos, row1Y, scaledWidths[1], 45);
                         doc.setFont("times", "bold");
-                        doc.setFontSize(9);
+                        doc.setFontSize(12); // Tamanho 12 como solicitado
                         // Introdução (linha 1)
-                        doc.text("Introdução", xPos + 5, row1Y + 12);
+                        doc.text("Introdução", xPos + 5, row1Y + 15);
                         // e (linha 2, centralizado)
-                        doc.text("e", xPos + 5, row1Y + 20);
+                        doc.text("e", xPos + 5, row1Y + 25);
                         // Motivação (linha 3)
-                        doc.text("Motivação", xPos + 5, row1Y + 28);
-                        doc.setFontSize(10);
+                        doc.text("Motivação", xPos + 5, row1Y + 35);
                         xPos += scaledWidths[1];
                         
                         // Outras colunas (vazias)
                         for (let j = 2; j < 7; j++) {
                             doc.setFillColor(255, 255, 255);
-                            doc.rect(xPos, row1Y, scaledWidths[j], 40, 'F');
-                            doc.rect(xPos, row1Y, scaledWidths[j], 40);
+                            doc.rect(xPos, row1Y, scaledWidths[j], 45, 'F');
+                            doc.rect(xPos, row1Y, scaledWidths[j], 45);
                             xPos += scaledWidths[j];
                         }
                         
                         // Linha 2: Mediação e Assimilação
-                        const row2Y = row1Y + 40;
+                        const row2Y = row1Y + 45;
                         xPos = 15;
                         
                         // Coluna TEMPO (vazia)
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row2Y, scaledWidths[0], 40, 'F');
-                        doc.rect(xPos, row2Y, scaledWidths[0], 40);
+                        doc.rect(xPos, row2Y, scaledWidths[0], 45, 'F');
+                        doc.rect(xPos, row2Y, scaledWidths[0], 45);
                         xPos += scaledWidths[0];
                         
-                        // Coluna FUNÇÕES DIDÁCTICAS (formatado em 3 linhas)
+                        // Coluna FUNÇÕES DIDÁCTICAS (formatado em 3 linhas, tamanho 12)
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row2Y, scaledWidths[1], 40, 'F');
-                        doc.rect(xPos, row2Y, scaledWidths[1], 40);
+                        doc.rect(xPos, row2Y, scaledWidths[1], 45, 'F');
+                        doc.rect(xPos, row2Y, scaledWidths[1], 45);
                         doc.setFont("times", "bold");
-                        doc.setFontSize(9);
-                        doc.text("Mediação", xPos + 5, row2Y + 12);
-                        doc.text("e", xPos + 5, row2Y + 20);
-                        doc.text("Assimilação", xPos + 5, row2Y + 28);
-                        doc.setFontSize(10);
+                        doc.setFontSize(12); // Tamanho 12
+                        doc.text("Mediação", xPos + 5, row2Y + 15);
+                        doc.text("e", xPos + 5, row2Y + 25);
+                        doc.text("Assimilação", xPos + 5, row2Y + 35);
                         xPos += scaledWidths[1];
                         
                         // Outras colunas (vazias)
                         for (let j = 2; j < 7; j++) {
                             doc.setFillColor(255, 255, 255);
-                            doc.rect(xPos, row2Y, scaledWidths[j], 40, 'F');
-                            doc.rect(xPos, row2Y, scaledWidths[j], 40);
+                            doc.rect(xPos, row2Y, scaledWidths[j], 45, 'F');
+                            doc.rect(xPos, row2Y, scaledWidths[j], 45);
                             xPos += scaledWidths[j];
                         }
                         
@@ -865,56 +868,54 @@
                         
                         // Linha 3: Domínio e Consolidação
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row3Y, scaledWidths[0], 40, 'F');
-                        doc.rect(xPos, row3Y, scaledWidths[0], 40);
+                        doc.rect(xPos, row3Y, scaledWidths[0], 45, 'F');
+                        doc.rect(xPos, row3Y, scaledWidths[0], 45);
                         xPos += scaledWidths[0];
                         
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row3Y, scaledWidths[1], 40, 'F');
-                        doc.rect(xPos, row3Y, scaledWidths[1], 40);
+                        doc.rect(xPos, row3Y, scaledWidths[1], 45, 'F');
+                        doc.rect(xPos, row3Y, scaledWidths[1], 45);
                         doc.setFont("times", "bold");
-                        doc.setFontSize(9);
-                        doc.text("Domínio", xPos + 5, row3Y + 12);
-                        doc.text("e", xPos + 5, row3Y + 20);
-                        doc.text("Consolidação", xPos + 5, row3Y + 28);
-                        doc.setFontSize(10);
+                        doc.setFontSize(12); // Tamanho 12
+                        doc.text("Domínio", xPos + 5, row3Y + 15);
+                        doc.text("e", xPos + 5, row3Y + 25);
+                        doc.text("Consolidação", xPos + 5, row3Y + 35);
                         xPos += scaledWidths[1];
                         
                         for (let j = 2; j < 7; j++) {
                             doc.setFillColor(255, 255, 255);
-                            doc.rect(xPos, row3Y, scaledWidths[j], 40, 'F');
-                            doc.rect(xPos, row3Y, scaledWidths[j], 40);
+                            doc.rect(xPos, row3Y, scaledWidths[j], 45, 'F');
+                            doc.rect(xPos, row3Y, scaledWidths[j], 45);
                             xPos += scaledWidths[j];
                         }
                         
                         // Linha 4: Controlo e Avaliação
-                        const row4Y = row3Y + 40;
+                        const row4Y = row3Y + 45;
                         xPos = 15;
                         
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row4Y, scaledWidths[0], 40, 'F');
-                        doc.rect(xPos, row4Y, scaledWidths[0], 40);
+                        doc.rect(xPos, row4Y, scaledWidths[0], 45, 'F');
+                        doc.rect(xPos, row4Y, scaledWidths[0], 45);
                         xPos += scaledWidths[0];
                         
                         doc.setFillColor(255, 255, 255);
-                        doc.rect(xPos, row4Y, scaledWidths[1], 40, 'F');
-                        doc.rect(xPos, row4Y, scaledWidths[1], 40);
+                        doc.rect(xPos, row4Y, scaledWidths[1], 45, 'F');
+                        doc.rect(xPos, row4Y, scaledWidths[1], 45);
                         doc.setFont("times", "bold");
-                        doc.setFontSize(9);
-                        doc.text("Controlo", xPos + 5, row4Y + 12);
-                        doc.text("e", xPos + 5, row4Y + 20);
-                        doc.text("Avaliação", xPos + 5, row4Y + 28);
-                        doc.setFontSize(10);
+                        doc.setFontSize(12); // Tamanho 12
+                        doc.text("Controlo", xPos + 5, row4Y + 15);
+                        doc.text("e", xPos + 5, row4Y + 25);
+                        doc.text("Avaliação", xPos + 5, row4Y + 35);
                         xPos += scaledWidths[1];
                         
                         for (let j = 2; j < 7; j++) {
                             doc.setFillColor(255, 255, 255);
-                            doc.rect(xPos, row4Y, scaledWidths[j], 40, 'F');
-                            doc.rect(xPos, row4Y, scaledWidths[j], 40);
+                            doc.rect(xPos, row4Y, scaledWidths[j], 45, 'F');
+                            doc.rect(xPos, row4Y, scaledWidths[j], 45);
                             xPos += scaledWidths[j];
                         }
                         
-                        // QUADRO MURAL (alterado de ANEXO / QUADRO MORAL)
+                        // QUADRO MURAL
                         const quadroY = row4Y + 50;
                         doc.setFontSize(16);
                         doc.setFont("times", "bold");
@@ -938,7 +939,7 @@
                 }
             }
             
-            // Auto-iniciar a geração após 1 segundo (mantido do código original)
+            // Auto-iniciar a geração após 1 segundo
             setTimeout(function() {
                 startGenerationProcess();
             }, 1000);
