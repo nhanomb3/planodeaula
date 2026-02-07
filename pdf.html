@@ -291,6 +291,38 @@
             color: #27ae60;
             font-weight: bold;
         }
+        
+        .countdown-timer {
+            font-size: 20px;
+            color: #e74c3c;
+            font-weight: bold;
+            margin: 20px 0;
+            font-family: 'Times New Roman', serif;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        .data-review {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .countdown-box {
+            margin: 20px auto;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            border-radius: 10px;
+            max-width: 300px;
+            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -320,6 +352,8 @@
                 <div class="stage-text">Finalizando</div>
             </div>
         </div>
+        
+        <div id="countdownTimer" class="countdown-timer hidden"></div>
     </div>
     
     <div class="container" id="mainContainer">
@@ -330,11 +364,13 @@
         </div>
         
         <div id="loadingSection">
-            <div class="loading" id="initialLoading">
-                Preparando geração do PDF... Por favor, aguarde.
+            <div class="data-review">
+                <p>Verifique os dados acima antes de iniciar a geração do PDF.</p>
+                <p>A geração começará automaticamente em <span id="countdownDisplay">10</span> segundos...</p>
             </div>
+            
             <div class="btn-group">
-                <button id="generatePdfBtn" class="btn primary-btn">Iniciar Geração do PDF</button>
+                <button id="generatePdfBtn" class="btn primary-btn">Iniciar Geração do PDF Agora</button>
                 <a href="index.html" class="btn secondary-btn">Voltar ao Formulário</a>
             </div>
         </div>
@@ -391,7 +427,8 @@
             const generatePdfBtn = document.getElementById('generatePdfBtn');
             const downloadPdfBtn = document.getElementById('downloadPdfBtn');
             const infoContainer = document.getElementById('infoContainer');
-            const initialLoading = document.getElementById('initialLoading');
+            const countdownTimer = document.getElementById('countdownTimer');
+            const countdownDisplay = document.getElementById('countdownDisplay');
             
             // Elementos dos estágios
             const stage1 = document.getElementById('stage1');
@@ -448,18 +485,21 @@
             let pdfDoc = null;
             let pdfGenerated = false;
             let progressInterval = null;
-            const totalProcessingTime = 20000; // 20 segundos (alterado de 30 para 20)
+            let countdownInterval = null;
+            let autoStartCountdown = null;
+            const totalProcessingTime = 20000; // 20 segundos no total
+            const countdownTime = 10000; // 10 segundos de contagem regressiva inicial
             const updateInterval = 100; // Atualizar a cada 100ms
             const totalUpdates = totalProcessingTime / updateInterval;
             const percentagePerUpdate = 100 / totalUpdates;
             
             // Atualizar a porcentagem no círculo
             function updatePercentage(percentage) {
-                currentPercentage = percentage;
-                percentageCircle.textContent = `${Math.min(percentage, 100)}%`;
+                currentPercentage = Math.min(percentage, 100);
+                percentageCircle.textContent = `${Math.round(currentPercentage)}%`;
                 
                 // Atualizar estágios baseado na porcentagem
-                updateStages(percentage);
+                updateStages(currentPercentage);
             }
             
             // Atualizar os estágios do progresso
@@ -471,17 +511,17 @@
                 });
                 
                 if (percentage >= 0) stage1.classList.add('active');
-                if (percentage >= 25) {
+                if (percentage > 25) {
                     stage1.querySelector('.stage-check').classList.add('completed');
                     stage1.querySelector('.stage-text').classList.add('completed');
                     stage2.classList.add('active');
                 }
-                if (percentage >= 50) {
+                if (percentage > 50) {
                     stage2.querySelector('.stage-check').classList.add('completed');
                     stage2.querySelector('.stage-text').classList.add('completed');
                     stage3.classList.add('active');
                 }
-                if (percentage >= 75) {
+                if (percentage > 75) {
                     stage3.querySelector('.stage-check').classList.add('completed');
                     stage3.querySelector('.stage-text').classList.add('completed');
                     stage4.classList.add('active');
@@ -498,8 +538,43 @@
                 if (submessage) statusSubtext.textContent = submessage;
             }
             
+            // Iniciar contagem regressiva inicial
+            function startAutoCountdown() {
+                let secondsLeft = countdownTime / 1000;
+                countdownDisplay.textContent = secondsLeft;
+                
+                autoStartCountdown = setInterval(function() {
+                    secondsLeft--;
+                    countdownDisplay.textContent = secondsLeft;
+                    
+                    if (secondsLeft <= 0) {
+                        clearInterval(autoStartCountdown);
+                        startGenerationProcess();
+                    }
+                }, 1000);
+            }
+            
+            // Iniciar contagem regressiva antes do processamento
+            function startCountdown() {
+                let secondsLeft = 5;
+                countdownTimer.classList.remove('hidden');
+                countdownTimer.textContent = `Iniciando em ${secondsLeft} segundos...`;
+                
+                countdownInterval = setInterval(function() {
+                    secondsLeft--;
+                    countdownTimer.textContent = `Iniciando em ${secondsLeft} segundos...`;
+                    
+                    if (secondsLeft <= 0) {
+                        clearInterval(countdownInterval);
+                        countdownTimer.classList.add('hidden');
+                        startPDFGeneration();
+                    }
+                }, 1000);
+            }
+            
             // Iniciar o processo de geração
             generatePdfBtn.addEventListener('click', function() {
+                clearInterval(autoStartCountdown);
                 startGenerationProcess();
             });
             
@@ -514,19 +589,32 @@
                 
                 currentPercentage = 0;
                 updatePercentage(0);
+                showStatus("Preparando Dados", "Analisando informações do formulário...");
+                
+                // Iniciar contagem regressiva de 5 segundos
+                setTimeout(() => {
+                    startCountdown();
+                }, 1000);
+            }
+            
+            // Função para iniciar a geração do PDF (após contagem regressiva)
+            function startPDFGeneration() {
+                currentPercentage = 0;
+                updatePercentage(0);
                 showStatus("Iniciando Processo", "Preparando a geração do PDF...");
                 
                 // Iniciar intervalo de progresso de 20 segundos
                 progressInterval = setInterval(function() {
-                    if (currentPercentage < 100) { // Agora vai até 100%
+                    if (currentPercentage < 100) {
                         currentPercentage += percentagePerUpdate;
-                        updatePercentage(Math.round(currentPercentage));
+                        updatePercentage(currentPercentage);
                         
+                        // Atualizar mensagens baseado na porcentagem
                         if (currentPercentage < 25) {
                             showStatus("Carregando Dados", "Obtendo informações do formulário...");
                         } else if (currentPercentage < 50) {
                             showStatus("Processando Informações", "Organizando dados para o PDF...");
-                        } else if (currentPercentage < 75) {
+                        } else if (currentPercentage < 80) {
                             showStatus("Gerando PDF", "Criando páginas do bloco de planificação...");
                         } else {
                             showStatus("Finalizando", "Preparando para download...");
@@ -536,12 +624,17 @@
                         if (progressInterval) {
                             clearInterval(progressInterval);
                         }
+                        // Verificar se o PDF já foi gerado
+                        if (pdfGenerated) {
+                            completeGeneration();
+                        }
                     }
                 }, updateInterval);
                 
+                // Iniciar a geração do PDF após 1 segundo
                 setTimeout(() => {
                     generatePDF(dados, dataFormatada);
-                }, 500);
+                }, 1000);
             }
             
             // Função para completar a geração
@@ -642,7 +735,7 @@
                     
                     doc.setLineWidth(0.5);
                     doc.line(60, 85, 235, 85);
-                    doc.setFontSize(14);
+                    doc.setFontSize(13);
                     doc.text("⬛", 148, 85, { align: "center" });
                     
                     doc.setFontSize(12); // Reduzido para caber melhor
@@ -946,7 +1039,11 @@
                     
                     pdfDoc = doc;
                     pdfGenerated = true;
-                    completeGeneration();
+                    
+                    // Se a barra de progresso já chegou a 100%, completar a geração
+                    if (currentPercentage >= 100) {
+                        completeGeneration();
+                    }
                     
                 } catch (error) {
                     console.error("Erro ao gerar PDF:", error);
@@ -961,10 +1058,10 @@
                 }
             }
             
-            // Auto-iniciar a geração após 1 segundo
+            // Iniciar contagem regressiva automática após 2 segundos
             setTimeout(function() {
-                startGenerationProcess();
-            }, 1000);
+                startAutoCountdown();
+            }, 2000);
         });
     </script>
 </body>
