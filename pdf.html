@@ -54,53 +54,99 @@
         /* Modal de Pagamento */
         .payment-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
         .payment-modal.active { opacity: 1; visibility: visible; }
-        .payment-content { background: white; border-radius: 15px; width: 90%; max-width: 500px; padding: 30px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); transform: translateY(20px); transition: transform 0.3s ease; }
+        .payment-content { 
+            background: white; 
+            border-radius: 15px; 
+            width: 90%; 
+            max-width: 500px; 
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px; 
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); 
+            transform: translateY(20px); 
+            transition: transform 0.3s ease; 
+        }
         .payment-modal.active .payment-content { transform: translateY(0); }
         
-        .payment-header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
-        .payment-header h3 { font-size: 24px; margin-bottom: 10px; }
+        .payment-header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: center; }
+        .payment-header h3 { font-size: 20px; margin-bottom: 8px; }
+        .payment-header p { font-size: 14px; opacity: 0.9; }
         
-        .aula-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
-        .aula-btn { padding: 12px 8px; background: #f3f4f6; border: 2px solid #e5e7eb; border-radius: 10px; cursor: pointer; transition: all 0.3s; font-weight: 600; color: #374151; font-size: 14px; }
+        .payment-step { margin-bottom: 15px; }
+        .payment-step h4 { font-size: 16px; margin-bottom: 10px; color: #333; }
+        
+        .aula-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
+        .aula-btn { padding: 10px 6px; background: #f3f4f6; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-weight: 600; color: #374151; font-size: 13px; }
         .aula-btn:hover { background: #e5e7eb; }
         .aula-btn.selected { background: #4f46e5; color: white; border-color: #4f46e5; }
         
-        .code-input { width: 100%; padding: 15px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 18px; letter-spacing: 2px; text-transform: uppercase; text-align: center; font-weight: bold; margin: 15px 0; }
+        .code-input { width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 16px; letter-spacing: 1px; text-transform: uppercase; text-align: center; font-weight: bold; margin: 10px 0; }
         .code-input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         
-        .payment-loader { display: none; text-align: center; margin: 20px 0; }
+        .payment-loader { display: none; text-align: center; margin: 15px 0; }
         .payment-spinner { border: 4px solid #f3f4f6; border-top: 4px solid #4f46e5; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
         
-        .payment-result { margin: 20px 0; padding: 15px; border-radius: 10px; display: none; }
+        .payment-result { margin: 15px 0; padding: 12px; border-radius: 10px; display: none; font-size: 14px; }
         .payment-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
         .payment-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
         
-        .payment-prices { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; }
-        .payment-prices ul { margin-left: 20px; margin-top: 10px; }
-        .payment-prices li { margin-bottom: 5px; }
-        
-        .contact-info { margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 10px; text-align: center; font-size: 14px; }
-        
-        .test-code-info { 
-            margin-top: 15px; 
-            padding: 10px; 
-            background: #fff3cd; 
-            border: 1px solid #ffecb5; 
-            border-radius: 8px; 
-            color: #856404;
-            font-size: 14px;
+        /* Estilo da seção de pagamento E-Mola */
+        .payment-mpesa {
+            margin-top: 15px;
+            padding: 12px;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 8px;
+            border-left: 3px solid #10b981;
+            font-size: 13px;
         }
-        .test-code-info strong { color: #856404; }
+        .payment-mpesa h4 {
+            color: #065f46;
+            margin-bottom: 8px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .payment-mpesa-details {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+        .payment-mpesa-details p {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .copy-btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s;
+        }
+        .copy-btn:hover {
+            background: #3730a3;
+            transform: translateY(-1px);
+        }
+        .copy-btn.copied {
+            background: #10b981;
+        }
         
         /* Estilo do botão de validação */
         .validate-btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.3s;
@@ -112,6 +158,17 @@
             cursor: not-allowed;
             transform: none;
         }
+        
+        .test-code-info { 
+            margin-top: 12px; 
+            padding: 8px; 
+            background: #fff3cd; 
+            border: 1px solid #ffecb5; 
+            border-radius: 6px; 
+            color: #856404;
+            font-size: 12px;
+        }
+        .test-code-info strong { color: #856404; }
     </style>
 </head>
 <body>
@@ -174,6 +231,19 @@
                 ✅ VALIDAR CÓDIGO E LIBERAR DOWNLOAD
             </button>
             
+            <!-- Seção de pagamento M-Pesa -->
+            <div class="payment-mpesa">
+                <h4>📱 Pagamento por E-Mola</h4>
+                <p>Para obter um código, faça o pagamento para:</p>
+                <div class="payment-mpesa-details">
+                    <p><strong>Número:</strong> 876393961 
+                        <button id="copyNumberBtn" class="copy-btn">Copiar</button>
+                    </p>
+                    <p><strong>Nome:</strong> Edmilson Bartolomeu Nhanombe</p>
+                    <p><em>Após o pagamento, você receberá um código de confirmação via SMS.</em></p>
+                </div>
+            </div>
+            
             <!-- Loader -->
             <div class="payment-loader" id="paymentLoader">
                 <div class="payment-spinner"></div>
@@ -184,7 +254,6 @@
             <div class="payment-result" id="paymentResult"></div>
             
             <div class="test-code-info">
-                <strong>Para teste:</strong> Use o código <strong>123456</strong> (válido para qualquer pacote)
             </div>
         </div>
     </div>
@@ -268,6 +337,7 @@
             const paymentLoader = document.getElementById('paymentLoader');
             const paymentResult = document.getElementById('paymentResult');
             const aulaButtons = document.querySelectorAll('.aula-btn');
+            const copyNumberBtn = document.getElementById('copyNumberBtn');
             
             let totalPaginas = dados.numAulas * 2;
             if (dados.muralAdicionado) totalPaginas += dados.numAulas;
@@ -354,6 +424,23 @@
             // Variáveis globais para o sistema de pagamento
             let selectedAula = null;
             
+            // Configurar botão copiar número
+            copyNumberBtn.addEventListener('click', function() {
+                const phoneNumber = '876393961';
+                navigator.clipboard.writeText(phoneNumber).then(() => {
+                    const originalText = this.textContent;
+                    this.textContent = 'Copiado!';
+                    this.classList.add('copied');
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                        this.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Erro ao copiar:', err);
+                    alert('Erro ao copiar número. Por favor, copie manualmente: 876393961');
+                });
+            });
+            
             // Configurar botões de aula do modal de pagamento
             aulaButtons.forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -422,9 +509,9 @@
                     return;
                 }
                 
-                // Verificar código de teste
-                if (codigo === "123456") {
-                    // Código de teste - sempre válido
+
+                if (codigo === "") {
+
                     paymentLoader.style.display = 'block';
                     paymentResult.style.display = 'none';
                     validarBtn.disabled = true;
@@ -493,7 +580,15 @@
                         }, 1000);
                         
                     } else {
-                        showPaymentResult("error", resultado.message || "❌ Código inválido ou já utilizado!");
+                        // MODIFICAÇÃO AQUI: Tratar mensagem específica do Google Apps Script
+                        let errorMessage = resultado.message || "❌ Código inválido ou já utilizado!";
+                        
+                        // Se a mensagem contiver "Código inválido para o pacote selecionado"
+                        if (errorMessage.includes("Código inválido para o pacote selecionado")) {
+                            errorMessage = "Erro: o código não existe no sistema.";
+                        }
+                        
+                        showPaymentResult("error", errorMessage);
                     }
                     
                 } catch (error) {
