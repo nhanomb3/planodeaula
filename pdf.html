@@ -7,322 +7,70 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Times New Roman', serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
-            line-height: 1.6;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            padding: 40px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .blurred {
-            filter: blur(5px);
-            opacity: 0.5;
-            transition: all 0.5s ease;
-            pointer-events: none;
-        }
-        
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 28px;
-            font-family: 'Times New Roman', serif;
-        }
-        
-        .processing-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.5s ease;
-        }
-        
-        .processing-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .spinner-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            margin-bottom: 30px;
-        }
-        
-        .spinner {
-            width: 100%;
-            height: 100%;
-            border: 8px solid rgba(52, 152, 219, 0.2);
-            border-top: 8px solid #3498db;
-            border-radius: 50%;
-            animation: spin 2s linear infinite;
-        }
-        
-        .percentage-circle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 48px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        
-        .status-text {
-            font-size: 24px;
-            color: #2c3e50;
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-family: 'Times New Roman', serif;
-        }
-        
-        .status-subtext {
-            font-size: 18px;
-            color: #7f8c8d;
-            font-family: 'Times New Roman', serif;
-        }
-        
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 15px 30px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-            border: none;
-            text-decoration: none;
-            display: inline-block;
-            min-width: 180px;
-            font-family: 'Times New Roman', serif;
-        }
-        
-        .primary-btn {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-        }
-        
-        .primary-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-        }
-        
-        .secondary-btn {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-            color: white;
-            box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
-        }
-        
-        .secondary-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
-        }
-        
-        .success-btn {
-            background: linear-gradient(135deg, #27ae60, #219653);
-            color: white;
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
-        }
-        
-        .success-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
-        }
-        
-        .info-box {
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 10px;
-            padding: 25px;
-            margin: 20px 0;
-            text-align: left;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-            font-family: 'Times New Roman', serif;
-        }
-        
-        .info-box h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 20px;
-            font-family: 'Times New Roman', serif;
-        }
-        
-        .info-row {
-            display: flex;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px dashed #ddd;
-        }
-        
-        .info-label {
-            font-weight: 600;
-            width: 150px;
-            color: #555;
-            font-family: 'Times New Roman', serif;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-        
-        .visible {
-            display: flex !important;
-            animation: fadeIn 0.5s;
-        }
-        
-        .loading {
-            font-size: 18px;
-            color: #3498db;
-            margin: 20px 0;
-            font-family: 'Times New Roman', serif;
-        }
-        
-        .success-message {
-            margin: 30px 0;
-            text-align: center;
-        }
-        
-        .success-message h2 {
-            color: #27ae60;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        
-        .success-message p {
-            font-size: 18px;
-            color: #555;
-            margin-bottom: 20px;
-        }
-        
-        .progress-stages {
-            margin-top: 20px;
-            width: 80%;
-            max-width: 400px;
-        }
-        
-        .progress-stage {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-        
-        .progress-stage.active {
-            background: #e3f2fd;
-            border-left: 4px solid #3498db;
-        }
-        
-        .stage-check {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            color: white;
-            font-size: 12px;
-        }
-        
-        .stage-check.completed {
-            background: #27ae60;
-        }
-        
-        .stage-text {
-            flex: 1;
-            text-align: left;
-            font-size: 14px;
-        }
-        
-        .stage-text.completed {
-            color: #27ae60;
-            font-weight: bold;
-        }
-        
-        .countdown-timer {
-            font-size: 20px;
-            color: #e74c3c;
-            font-weight: bold;
-            margin: 20px 0;
-            font-family: 'Times New Roman', serif;
-            animation: pulse 1.5s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
-        }
-        
-        .data-review {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #3498db;
-        }
-        
-        .countdown-box {
-            margin: 20px auto;
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-            border-radius: 10px;
-            max-width: 300px;
-            box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Times New Roman', serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #333; line-height: 1.6; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .container { max-width: 800px; margin: 0 auto; background-color: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); padding: 40px; text-align: center; position: relative; }
+        .blurred { filter: blur(5px); opacity: 0.5; transition: all 0.5s ease; pointer-events: none; }
+        h1 { color: #2c3e50; margin-bottom: 20px; font-size: 28px; font-family: 'Times New Roman', serif; }
+        .processing-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.5s ease; }
+        .processing-overlay.active { opacity: 1; visibility: visible; }
+        .spinner-container { position: relative; width: 200px; height: 200px; margin-bottom: 30px; }
+        .spinner { width: 100%; height: 100%; border: 8px solid rgba(52, 152, 219, 0.2); border-top: 8px solid #3498db; border-radius: 50%; animation: spin 2s linear infinite; }
+        .percentage-circle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; font-weight: bold; color: #2c3e50; }
+        .status-text { font-size: 24px; color: #2c3e50; font-weight: bold; margin-bottom: 10px; font-family: 'Times New Roman', serif; }
+        .status-subtext { font-size: 18px; color: #7f8c8d; font-family: 'Times New Roman', serif; }
+        .btn-group { display: flex; gap: 15px; margin-top: 30px; justify-content: center; flex-wrap: wrap; }
+        .btn { padding: 15px 30px; font-size: 16px; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-weight: 600; border: none; text-decoration: none; display: inline-block; min-width: 180px; font-family: 'Times New Roman', serif; }
+        .primary-btn { background: linear-gradient(135deg, #3498db, #2980b9); color: white; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3); }
+        .primary-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4); }
+        .secondary-btn { background: linear-gradient(135deg, #95a5a6, #7f8c8d); color: white; box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3); }
+        .secondary-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4); }
+        .success-btn { background: linear-gradient(135deg, #27ae60, #219653); color: white; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3); }
+        .success-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4); }
+        .info-box { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 10px; padding: 25px; margin: 20px 0; text-align: left; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05); font-family: 'Times New Roman', serif; }
+        .info-box h3 { color: #2c3e50; margin-bottom: 15px; font-size: 20px; font-family: 'Times New Roman', serif; }
+        .info-row { display: flex; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed #ddd; }
+        .info-label { font-weight: 600; width: 150px; color: #555; font-family: 'Times New Roman', serif; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
+        .visible { display: flex !important; animation: fadeIn 0.5s; }
+        .loading { font-size: 18px; color: #3498db; margin: 20px 0; font-family: 'Times New Roman', serif; }
+        .success-message { margin: 30px 0; text-align: center; }
+        .success-message h2 { color: #27ae60; font-size: 28px; margin-bottom: 10px; }
+        .success-message p { font-size: 18px; color: #555; margin-bottom: 20px; }
+        .progress-stages { margin-top: 20px; width: 80%; max-width: 400px; }
+        .progress-stage { display: flex; align-items: center; margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 8px; transition: all 0.3s; }
+        .progress-stage.active { background: #e3f2fd; border-left: 4px solid #3498db; }
+        .stage-check { width: 24px; height: 24px; border-radius: 50%; background: #ddd; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: white; font-size: 12px; }
+        .stage-check.completed { background: #27ae60; }
+        .stage-text { flex: 1; text-align: left; font-size: 14px; }
+        .stage-text.completed { color: #27ae60; font-weight: bold; }
+        .countdown-timer { font-size: 20px; color: #e74c3c; font-weight: bold; margin: 20px 0; font-family: 'Times New Roman', serif; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .data-review { margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 10px; border-left: 4px solid #3498db; }
+        .countdown-box { margin: 20px auto; padding: 15px 30px; background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%); border-radius: 10px; max-width: 300px; box-shadow: 0 4px 15px rgba(255, 154, 158, 0.3); }
+        .payment-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .payment-modal.active { opacity: 1; visibility: visible; }
+        .payment-content { background: white; border-radius: 15px; width: 90%; max-width: 500px; padding: 30px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); transform: translateY(20px); transition: transform 0.3s ease; }
+        .payment-modal.active .payment-content { transform: translateY(0); }
+        .payment-header { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
+        .payment-header h3 { font-size: 24px; margin-bottom: 10px; }
+        .aula-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+        .aula-btn { padding: 12px 8px; background: #f3f4f6; border: 2px solid #e5e7eb; border-radius: 10px; cursor: pointer; transition: all 0.3s; font-weight: 600; color: #374151; font-size: 14px; }
+        .aula-btn:hover { background: #e5e7eb; }
+        .aula-btn.selected { background: #4f46e5; color: white; border-color: #4f46e5; }
+        .code-input { width: 100%; padding: 15px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 18px; letter-spacing: 2px; text-transform: uppercase; text-align: center; font-weight: bold; margin: 15px 0; }
+        .code-input:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+        .payment-loader { display: none; text-align: center; margin: 20px 0; }
+        .payment-spinner { border: 4px solid #f3f4f6; border-top: 4px solid #4f46e5; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+        .payment-result { margin: 20px 0; padding: 15px; border-radius: 10px; display: none; }
+        .payment-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .payment-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .payment-prices { margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; }
+        .payment-prices ul { margin-left: 20px; margin-top: 10px; }
+        .payment-prices li { margin-bottom: 5px; }
+        .contact-info { margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 10px; text-align: center; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -333,7 +81,6 @@
         </div>
         <div class="status-text" id="statusText">Iniciando Processo</div>
         <div class="status-subtext" id="statusSubtext">Preparando a geração do PDF...</div>
-        
         <div class="progress-stages">
             <div class="progress-stage" id="stage1">
                 <div class="stage-check">1</div>
@@ -352,48 +99,102 @@
                 <div class="stage-text">Finalizando</div>
             </div>
         </div>
-        
         <div id="countdownTimer" class="countdown-timer hidden"></div>
+    </div>
+    
+    <div id="paymentModal" class="payment-modal">
+        <div class="payment-content">
+            <div class="payment-header">
+                <h3>🔐 VALIDAR CÓDIGO DE ACESSO</h3>
+                <p>Insira seu código para liberar o download</p>
+            </div>
+            <div class="payment-step">
+                <h4>1. Selecione seu pacote:</h4>
+                <div class="aula-buttons" id="aulaButtons">
+                    <button class="aula-btn" data-aula="10 aulas">10 AULAS</button>
+                    <button class="aula-btn" data-aula="20 aulas">20 AULAS</button>
+                    <button class="aula-btn" data-aula="30 aulas">30 AULAS</button>
+                    <button class="aula-btn" data-aula="40 aulas">40 AULAS</button>
+                    <button class="aula-btn" data-aula="50 aulas">50 AULAS</button>
+                    <button class="aula-btn" data-aula="60 aulas">60 AULAS</button>
+                </div>
+            </div>
+            <div class="payment-step">
+                <h4>2. Insira seu código:</h4>
+                <input type="text" id="codigoInput" class="code-input" placeholder="EX: ABC123" maxlength="20">
+            </div>
+            <button id="validarBtn" class="btn primary-btn" style="width: 100%;">
+                ✅ VALIDAR CÓDIGO E LIBERAR DOWNLOAD
+            </button>
+            <div class="payment-loader" id="paymentLoader">
+                <div class="payment-spinner"></div>
+                <p>Validando código...</p>
+            </div>
+            <div class="payment-result" id="paymentResult"></div>
+            <div class="payment-prices">
+                <h4>💰 Preços dos Pacotes:</h4>
+                <ul>
+                    <li><strong>10 aulas:</strong> 50 MZN</li>
+                    <li><strong>20 aulas:</strong> 100 MZN</li>
+                    <li><strong>30 aulas:</strong> 150 MZN</li>
+                    <li><strong>40 aulas:</strong> 200 MZN</li>
+                    <li><strong>50 aulas:</strong> 250 MZN</li>
+                    <li><strong>60 aulas:</strong> 300 MZN</li>
+                </ul>
+                <p style="margin-top: 10px; color: #e74c3c; font-weight: bold;">
+                    <em>Quadro Mural: +5 MZN por aula (opcional)</em>
+                </p>
+            </div>
+            <div class="contact-info">
+                <p><strong>Para adquirir um código:</strong></p>
+                <p>WhatsApp: +258 XX XXX XXXX</p>
+                <p>M-Pesa: +258 XX XXX XXXX</p>
+                <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                    Um código válido libera apenas UMA geração de PDF
+                </p>
+            </div>
+        </div>
     </div>
     
     <div class="container" id="mainContainer">
         <h1>Gerando PDF do Bloco de Planificação</h1>
-        
-        <div id="infoContainer" class="info-box">
-            <!-- As informações serão carregadas aqui -->
-        </div>
-        
+        <div id="infoContainer" class="info-box"></div>
         <div id="loadingSection">
             <div class="data-review">
                 <p>Verifique os dados acima antes de iniciar a geração do PDF.</p>
                 <p>A geração começará automaticamente em <span id="countdownDisplay">10</span> segundos...</p>
             </div>
-            
             <div class="btn-group">
                 <button id="generatePdfBtn" class="btn primary-btn">Iniciar Geração do PDF Agora</button>
                 <a href="index.html" class="btn secondary-btn">Voltar ao Formulário</a>
             </div>
         </div>
-        
         <div id="successSection" class="hidden">
             <div class="success-message">
                 <h2>✅ PDF Gerado com Sucesso!</h2>
                 <p>Seu bloco de planificação está pronto para download.</p>
+                <p style="color: #666; font-size: 16px;">
+                    O PDF foi gerado com <span id="totalPaginasGeradas">0</span> páginas.
+                </p>
             </div>
-            
             <div class="btn-group">
                 <button id="downloadPdfBtn" class="btn success-btn">📥 Baixar PDF</button>
                 <a href="index.html" class="btn secondary-btn">Criar Novo Bloco</a>
+            </div>
+            <div class="info-box" style="margin-top: 20px; text-align: center;">
+                <h3>📋 Resumo do Pedido</h3>
+                <p><strong>Total de páginas:</strong> <span id="resumoPaginas">0</span></p>
+                <p><strong>Valor estimado:</strong> <span id="resumoValor">0 MZN</span></p>
+                <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                    <em>Para gerar outro PDF, você precisará de um novo código de acesso.</em>
+                </p>
             </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Obter parâmetros da URL
             const urlParams = new URLSearchParams(window.location.search);
-            
-            // Extrair dados dos parâmetros
             const dados = {
                 escola: urlParams.get('escola') || '',
                 professor: urlParams.get('professor') || '',
@@ -406,7 +207,6 @@
                 muralAdicionado: urlParams.get('muralAdicionado') === '1'
             };
             
-            // Verificar se há dados suficientes
             if (!dados.escola || !dados.professor || !dados.numAulas) {
                 document.getElementById('infoContainer').innerHTML = `
                     <h3 style="color: #e74c3c;">⚠️ Dados Insuficientes</h3>
@@ -417,7 +217,6 @@
                 return;
             }
             
-            // Elementos DOM
             const processingOverlay = document.getElementById('processingOverlay');
             const percentageCircle = document.getElementById('percentageCircle');
             const statusText = document.getElementById('statusText');
@@ -430,21 +229,24 @@
             const infoContainer = document.getElementById('infoContainer');
             const countdownTimer = document.getElementById('countdownTimer');
             const countdownDisplay = document.getElementById('countdownDisplay');
-            
-            // Elementos dos estágios
             const stage1 = document.getElementById('stage1');
             const stage2 = document.getElementById('stage2');
             const stage3 = document.getElementById('stage3');
             const stage4 = document.getElementById('stage4');
+            const paymentModal = document.getElementById('paymentModal');
+            const codigoInput = document.getElementById('codigoInput');
+            const validarBtn = document.getElementById('validarBtn');
+            const paymentLoader = document.getElementById('paymentLoader');
+            const paymentResult = document.getElementById('paymentResult');
+            const aulaButtons = document.querySelectorAll('.aula-btn');
             
-            // Calcular número total de páginas
-            let totalPaginas = dados.numAulas * 2; // 2 páginas por aula
-            if (dados.muralAdicionado) {
-                totalPaginas += dados.numAulas; // +1 página por aula se mural adicionado
-            }
-            totalPaginas += 2; // Capa + Declaração
+            let totalPaginas = dados.numAulas * 2;
+            if (dados.muralAdicionado) totalPaginas += dados.numAulas;
+            totalPaginas += 2;
             
-            // Exibir informações na tela inicialmente
+            let valorBase = Math.ceil(dados.numAulas / 10) * 50;
+            if (dados.muralAdicionado) valorBase += dados.numAulas * 5;
+            
             infoContainer.innerHTML = `
                 <h3>📋 Dados do Bloco</h3>
                 <div class="info-row">
@@ -482,16 +284,21 @@
                 <div class="info-row">
                     <div class="info-label">Quadro Mural:</div>
                     <div style="color: ${dados.muralAdicionado ? '#27ae60' : '#e74c3c'}; font-weight: bold;">
-                        ${dados.muralAdicionado ? "✓ ADICIONADO (+5 MZN)" : "Não adicionado"}
+                        ${dados.muralAdicionado ? "✓ ADICIONADO (+5 MZN por aula)" : "Não adicionado"}
                     </div>
                 </div>
                 <div class="info-row">
                     <div class="info-label">Período:</div>
                     <div>${dados.periodo || "Não informado"}</div>
                 </div>
+                <div class="info-row" style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                    <div class="info-label">💰 Valor Estimado:</div>
+                    <div style="color: #27ae60; font-weight: bold; font-size: 18px;">
+                        ${valorBase} MZN
+                    </div>
+                </div>
             `;
             
-            // Formatar data
             let dataFormatada = "_____/_________/20______";
             if (dados.dataGeracao) {
                 const dataObj = new Date(dados.dataGeracao);
@@ -502,36 +309,66 @@
                 });
             }
             
-            // Variáveis para controle do processo
             let currentPercentage = 0;
             let pdfDoc = null;
             let pdfGenerated = false;
             let progressInterval = null;
             let countdownInterval = null;
             let autoStartCountdown = null;
-            const totalProcessingTime = 20000; // 20 segundos no total
-            const countdownTime = 10000; // 10 segundos de contagem regressiva inicial
-            const updateInterval = 100; // Atualizar a cada 100ms
+            let selectedAulaPacote = null;
+            let codigoValidado = false;
+            const totalProcessingTime = 20000;
+            const countdownTime = 10000;
+            const updateInterval = 100;
             const totalUpdates = totalProcessingTime / updateInterval;
             const percentagePerUpdate = 100 / totalUpdates;
             
-            // Atualizar a porcentagem no círculo
+            // Configurar botões de aula
+            aulaButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    aulaButtons.forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedAulaPacote = this.dataset.aula;
+                    
+                    // Habilitar input de código
+                    codigoInput.disabled = false;
+                    codigoInput.focus();
+                    
+                    // Habilitar botão de validação
+                    validarBtn.disabled = false;
+                });
+            });
+            
+            function autoSelectPacote() {
+                const numAulas = dados.numAulas;
+                let pacote;
+                if (numAulas <= 10) pacote = "10 aulas";
+                else if (numAulas <= 20) pacote = "20 aulas";
+                else if (numAulas <= 30) pacote = "30 aulas";
+                else if (numAulas <= 40) pacote = "40 aulas";
+                else if (numAulas <= 50) pacote = "50 aulas";
+                else pacote = "60 aulas";
+                
+                aulaButtons.forEach(btn => {
+                    if (btn.dataset.aula === pacote) {
+                        btn.classList.add('selected');
+                        selectedAulaPacote = pacote;
+                        // Habilitar input de código
+                        codigoInput.disabled = false;
+                        // Habilitar botão de validação
+                        validarBtn.disabled = false;
+                    }
+                });
+            }
+            
             function updatePercentage(percentage) {
                 currentPercentage = Math.min(percentage, 100);
                 percentageCircle.textContent = `${Math.round(currentPercentage)}%`;
-                
-                // Atualizar estágios baseado na porcentagem
-                updateStages(currentPercentage);
-            }
-            
-            // Atualizar os estágios do progresso
-            function updateStages(percentage) {
                 [stage1, stage2, stage3, stage4].forEach(stage => {
                     stage.classList.remove('active');
                     stage.querySelector('.stage-check').classList.remove('completed');
                     stage.querySelector('.stage-text').classList.remove('completed');
                 });
-                
                 if (percentage >= 0) stage1.classList.add('active');
                 if (percentage > 25) {
                     stage1.querySelector('.stage-check').classList.add('completed');
@@ -554,21 +391,17 @@
                 }
             }
             
-            // Mostrar mensagem de status
             function showStatus(message, submessage = "") {
                 statusText.textContent = message;
                 if (submessage) statusSubtext.textContent = submessage;
             }
             
-            // Iniciar contagem regressiva inicial
             function startAutoCountdown() {
                 let secondsLeft = countdownTime / 1000;
                 countdownDisplay.textContent = secondsLeft;
-                
                 autoStartCountdown = setInterval(function() {
                     secondsLeft--;
                     countdownDisplay.textContent = secondsLeft;
-                    
                     if (secondsLeft <= 0) {
                         clearInterval(autoStartCountdown);
                         startGenerationProcess();
@@ -576,16 +409,13 @@
                 }, 1000);
             }
             
-            // Iniciar contagem regressiva antes do processamento
             function startCountdown() {
                 let secondsLeft = 5;
                 countdownTimer.classList.remove('hidden');
                 countdownTimer.textContent = `Iniciando em ${secondsLeft} segundos...`;
-                
                 countdownInterval = setInterval(function() {
                     secondsLeft--;
                     countdownTimer.textContent = `Iniciando em ${secondsLeft} segundos...`;
-                    
                     if (secondsLeft <= 0) {
                         clearInterval(countdownInterval);
                         countdownTimer.classList.add('hidden');
@@ -594,13 +424,11 @@
                 }, 1000);
             }
             
-            // Iniciar o processo de geração
             generatePdfBtn.addEventListener('click', function() {
                 clearInterval(autoStartCountdown);
                 startGenerationProcess();
             });
             
-            // Função para iniciar o processo de geração
             function startGenerationProcess() {
                 infoContainer.classList.add('hidden');
                 loadingSection.classList.add('hidden');
@@ -608,30 +436,22 @@
                 processingOverlay.classList.add('active');
                 generatePdfBtn.disabled = true;
                 generatePdfBtn.textContent = "Gerando...";
-                
                 currentPercentage = 0;
                 updatePercentage(0);
                 showStatus("Preparando Dados", "Analisando informações do formulário...");
-                
-                // Iniciar contagem regressiva de 5 segundos
                 setTimeout(() => {
                     startCountdown();
                 }, 1000);
             }
             
-            // Função para iniciar a geração do PDF (após contagem regressiva)
             function startPDFGeneration() {
                 currentPercentage = 0;
                 updatePercentage(0);
                 showStatus("Iniciando Processo", "Preparando a geração do PDF...");
-                
-                // Iniciar intervalo de progresso de 20 segundos
                 progressInterval = setInterval(function() {
                     if (currentPercentage < 100) {
                         currentPercentage += percentagePerUpdate;
                         updatePercentage(currentPercentage);
-                        
-                        // Atualizar mensagens baseado na porcentagem
                         if (currentPercentage < 25) {
                             showStatus("Carregando Dados", "Obtendo informações do formulário...");
                         } else if (currentPercentage < 50) {
@@ -642,47 +462,158 @@
                             showStatus("Finalizando", "Preparando para download...");
                         }
                     } else {
-                        // Quando chegar a 100%, parar o intervalo
                         if (progressInterval) {
                             clearInterval(progressInterval);
                         }
-                        // Verificar se o PDF já foi gerado
                         if (pdfGenerated) {
                             completeGeneration();
                         }
                     }
                 }, updateInterval);
-                
-                // Iniciar a geração do PDF após 1 segundo
                 setTimeout(() => {
                     generatePDF(dados, dataFormatada);
                 }, 1000);
             }
             
-            // Função para completar a geração
             function completeGeneration() {
-                // Garantir que a porcentagem seja 100%
                 updatePercentage(100);
                 showStatus("Processo Concluído!", "PDF gerado com sucesso!");
-                
                 setTimeout(() => {
                     processingOverlay.classList.remove('active');
                     mainContainer.classList.remove('blurred');
                     successSection.classList.remove('hidden');
+                    document.getElementById('totalPaginasGeradas').textContent = totalPaginas;
+                    document.getElementById('resumoPaginas').textContent = totalPaginas;
+                    document.getElementById('resumoValor').textContent = valorBase + " MZN";
                 }, 1000);
             }
             
-            // Botão para baixar PDF
+            // Botão de download do PDF - abre modal de pagamento
             downloadPdfBtn.addEventListener('click', function() {
                 if (pdfDoc && pdfGenerated) {
-                    const fileName = `Bloco_Planificacao_${dados.professor.replace(/\s+/g, '_')}_${dados.numAulas}_Aulas${dados.muralAdicionado ? '_ComMural' : ''}.pdf`;
-                    pdfDoc.save(fileName);
+                    // Limpar modal anterior
+                    codigoInput.value = '';
+                    paymentResult.style.display = 'none';
+                    paymentLoader.style.display = 'none';
+                    validarBtn.disabled = true;
+                    
+                    // Auto selecionar pacote baseado no número de aulas
+                    autoSelectPacote();
+                    
+                    // Abrir modal
+                    paymentModal.classList.add('active');
                 } else {
                     alert("PDF ainda não foi gerado. Por favor, aguarde.");
                 }
             });
             
-            // Função para carregar imagem
+            // Validação do código
+            validarBtn.addEventListener('click', validarCodigo);
+            
+            // Permitir Enter no campo de código
+            codigoInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    validarCodigo();
+                }
+            });
+            
+            async function validarCodigo() {
+                const codigo = codigoInput.value.trim().toUpperCase();
+                
+                if (!selectedAulaPacote) {
+                    showPaymentResult("error", "Selecione o pacote de aulas!");
+                    return;
+                }
+                
+                if (!codigo) {
+                    showPaymentResult("error", "Digite o código de acesso!");
+                    return;
+                }
+                
+                // Mostrar loader
+                paymentLoader.style.display = 'block';
+                paymentResult.style.display = 'none';
+                validarBtn.disabled = true;
+                codigoInput.disabled = true;
+                
+                try {
+                    // SEU LINK DO GOOGLE APPS SCRIPT AQUI
+                    const SEU_LINK = 'https://script.google.com/macros/s/AKfycbz4Y3-feOV4VHowO4rPdy7B-hoSKWiDtZvj9PoGLEjV7gZ77gFU3-nRbSVli-wxYHpz/exec';
+                    
+                    // Fazer chamada para o Google Apps Script
+                    const url = SEU_LINK + '?tipoAula=' + encodeURIComponent(selectedAulaPacote) + '&codigo=' + encodeURIComponent(codigo);
+                    
+                    const response = await fetch(url);
+                    const resultado = await response.json();
+                    
+                    if (resultado.success) {
+                        // Verificar se o pacote é suficiente
+                        const pacoteSelecionado = parseInt(selectedAulaPacote.split(' ')[0]);
+                        const aulasSolicitadas = dados.numAulas;
+                        
+                        if (pacoteSelecionado < aulasSolicitadas) {
+                            showPaymentResult("error", `Código válido apenas para ${pacoteSelecionado} aulas. Seu PDF tem ${aulasSolicitadas} aulas.`);
+                            paymentLoader.style.display = 'none';
+                            validarBtn.disabled = false;
+                            codigoInput.disabled = false;
+                            return;
+                        }
+                        
+                        codigoValidado = true;
+                        showPaymentResult("success", "✅ Código validado com sucesso! Iniciando download...");
+                        
+                        setTimeout(() => {
+                            paymentModal.classList.remove('active');
+                            baixarPDF();
+                        }, 1000);
+                        
+                    } else {
+                        showPaymentResult("error", resultado.message || "❌ Código inválido ou já utilizado!");
+                        paymentLoader.style.display = 'none';
+                        validarBtn.disabled = false;
+                        codigoInput.disabled = false;
+                    }
+                    
+                } catch (error) {
+                    console.error('Erro na validação:', error);
+                    showPaymentResult("error", "Erro ao conectar com o servidor. Tente novamente.");
+                    paymentLoader.style.display = 'none';
+                    validarBtn.disabled = false;
+                    codigoInput.disabled = false;
+                }
+            }
+            
+            function showPaymentResult(tipo, mensagem) {
+                paymentResult.style.display = 'block';
+                paymentResult.className = `payment-result ${tipo === 'success' ? 'payment-success' : 'payment-error'}`;
+                paymentResult.innerHTML = `<p>${mensagem}</p>`;
+            }
+            
+            function baixarPDF() {
+                if (pdfDoc && pdfGenerated && codigoValidado) {
+                    const fileName = `Bloco_Planificacao_${dados.professor.replace(/\s+/g, '_')}_${dados.numAulas}_Aulas${dados.muralAdicionado ? '_ComMural' : ''}.pdf`;
+                    pdfDoc.save(fileName);
+                    downloadPdfBtn.disabled = true;
+                    downloadPdfBtn.textContent = "✅ PDF Baixado";
+                    
+                    // Desabilitar o botão para evitar múltiplos downloads
+                    setTimeout(() => {
+                        downloadPdfBtn.disabled = true;
+                    }, 1000);
+                } else if (!codigoValidado) {
+                    alert("Código não validado. Por favor, valide primeiro.");
+                } else {
+                    alert("PDF ainda não foi gerado. Por favor, aguarde.");
+                }
+            }
+            
+            // Fechar modal ao clicar fora
+            paymentModal.addEventListener('click', function(e) {
+                if (e.target === paymentModal) {
+                    paymentModal.classList.remove('active');
+                }
+            });
+            
             function loadImage(url) {
                 return new Promise((resolve, reject) => {
                     const img = new Image();
@@ -701,7 +632,6 @@
                 });
             }
             
-            // Função para gerar o PDF
             async function generatePDF(dados, dataFormatada) {
                 try {
                     const { jsPDF } = window.jspdf;
@@ -718,12 +648,11 @@
                         creator: 'Sistema de Geração de Blocos'
                     });
                     
-                    // ===== PÁGINA 1 - CAPA =====
+                    // PÁGINA 1 - CAPA
                     const marginLeft = 15;
                     const marginRight = 15;
                     const marginTop = 15;
                     const marginBottom = 15;
-                    
                     const usableWidth = 297 - marginLeft - marginRight;
                     const usableHeight = 210 - marginTop - marginBottom;
                     
@@ -762,7 +691,6 @@
                     doc.text(`DISCIPLINA: ${dados.disciplina || "___________________"}`, 148, 120, { align: "center" });
                     doc.text(`CLASSE: ${dados.classe || "___________________"}`, 148, 130, { align: "center" });
                     
-                    // Mostrar se o mural foi adicionado
                     let infoAulas = `BLOCO COM ${dados.numAulas} AULAS: ${dados.numAulas * 2} páginas`;
                     if (dados.muralAdicionado) {
                         infoAulas += ` + ${dados.numAulas} páginas de Quadro Mural`;
@@ -772,9 +700,8 @@
                     doc.setFontSize(10);
                     doc.text(`Data de geração: ${dataFormatada}`, 148, 180, { align: "center" });
                     
-                    // ===== PÁGINA 2 - DECLARAÇÃO PEDAGÓGICA =====
+                    // PÁGINA 2 - DECLARAÇÃO PEDAGÓGICA
                     doc.addPage();
-                    
                     doc.setLineWidth(1.5);
                     doc.rect(marginLeft, marginTop, usableWidth, usableHeight);
                     doc.setLineWidth(0.8);
@@ -786,7 +713,6 @@
                     
                     doc.setFontSize(11);
                     doc.setFont("times", "normal");
-                    
                     let yPos = 50;
                     const textoDeclaracao = [
                         "O presente documento constitui um instrumento oficial de planificação didática, elaborado em conformidade com as diretrizes curriculares nacionais e os princípios pedagógicos estabelecidos pelo Ministério da Educação de Moçambique.",
@@ -795,7 +721,7 @@
                         "",
                         "O conteúdo aqui plasmado reflete o planeamento pedagógico do Professor, baseado no programa curricular vigente, e deve ser utilizado com ética, responsabilidade e compromisso com a qualidade educativa.",
                         "",
-                        "Fica expressamente proibida a reprodução, distribuição, partilha ou utilização por terceiros não autorizados, resguardando-se os direitos de propriedade intelectual e as normas deontológicas da profissão.",
+                        "Fica expressamente proibida a reprodução, distribution, partilha ou utilização por terceiros não autorizados, resguardando-se os direitos de propriedade intelectual e as normas deontológicas da profissão.",
                         "",
                         `A presente declaração atesta a autenticidade e finalidade educativa deste documento, que poderá ser solicitado para fins de supervisão pedagógica e avaliação do desempenho do Professor ${dados.professor || "___________________"}, nos termos legais aplicáveis.`
                     ];
@@ -809,7 +735,6 @@
                             doc.rect(marginLeft + 2, marginTop + 2, usableWidth - 4, usableHeight - 4);
                             yPos = 35;
                         }
-                        
                         if (linha === "") {
                             yPos += 5;
                         } else {
@@ -825,29 +750,23 @@
                     doc.text("_________________________________________", marginLeft + 10, yPos);
                     yPos += 10;
                     doc.text(dados.professor || "___________________", marginLeft + 10, yPos);
-                    
                     doc.setFontSize(10);
                     doc.text(`Data: ${dataFormatada}`, 148, 185, { align: "center" });
                     
-                    // ===== PÁGINAS DE PLANO DE AULA =====
+                    // PÁGINAS DE PLANO DE AULA
                     for (let i = 1; i <= dados.numAulas; i++) {
                         // PÁGINA 1 DA AULA
-                        doc.addPage('a4', 'l'); // 'l' para landscape (horizontal)
-                        
-                        // Paginação no canto superior direito
+                        doc.addPage('a4', 'l');
+                        const totalPagesAula = dados.muralAdicionado ? 3 : 2;
                         doc.setFontSize(9);
                         doc.setFont("times", "normal");
-                        const totalPagesAula = dados.muralAdicionado ? 3 : 2;
                         doc.text(`Aula ${i} - Página 1/${totalPagesAula}`, 270, 12, { align: "right" });
-                        
                         doc.setFontSize(20);
                         doc.setFont("times", "bold");
                         doc.text("PLANO DE AULA", 148, 22, { align: "center" });
-                        
                         doc.setFontSize(12);
                         doc.setFont("times", "normal");
                         
-                        // Coluna esquerda - COM TEMA AUMENTADO PARA MELHOR ESCRITA MANUAL
                         let leftY = 30;
                         doc.text(`Escola: ${dados.escola || "___________________"}`, 15, leftY);
                         leftY += 6;
@@ -859,16 +778,12 @@
                         leftY += 6;
                         doc.text(`Unidade Temática: ___________________`, 15, leftY);
                         leftY += 6;
-                        // TRAÇO DO TEMA AUMENTADO PARA MELHOR ESCRITA MANUAL
                         doc.text(`Tema: _____________________________________________________________`, 15, leftY);
                         leftY += 8;
-                        
-                        // Objetivo Geral com traço em negrito
                         doc.setFont("times", "bold");
                         doc.text(`Objectivo Geral: ________________________________________`, 15, leftY);
                         leftY += 10;
                         
-                        // Coluna direita - AFASTADA PARA MARGEM DIREITA
                         let rightY = 30;
                         doc.setFont("times", "bold");
                         doc.text(`Classe: ${dados.classe || "__________"}`, 170, rightY);
@@ -886,7 +801,6 @@
                         rightY += 6;
                         doc.text(`Número de alunos: __________`, 170, rightY);
                         
-                        // Objectivos específicos
                         let objY = Math.max(leftY, rightY) + 5;
                         doc.setFont("times", "bold");
                         doc.text("OBJECTIVOS ESPECÍFICOS:", 15, objY);
@@ -898,25 +812,17 @@
                         objY += 6;
                         doc.text("3. Afetivo: ___________________________________________________", 20, objY);
                         
-                        // TABELA PRINCIPAL - Página 1
                         const tableY = objY + 10;
-                        
-                        // Configurar larguras das colunas otimizadas
                         const colWidths = [22, 38, 34, 38, 38, 34, 38];
                         const totalWidth = colWidths.reduce((a, b) => a + b, 0);
                         const scaleFactor = 267 / totalWidth;
                         const scaledWidths = colWidths.map(w => w * scaleFactor);
-                        
-                        // Posição inicial da tabela (centralizada)
                         const tableStartX = (297 - 267) / 2;
                         
-                        // Cabeçalho da tabela
                         doc.setFont("times", "bold");
                         doc.setFontSize(10);
-                        
                         let xPos = tableStartX;
                         const headerY = tableY;
-                        
                         const headers = ["TEMPO", "FUNÇÃO DIDÁCTICA", "CONTEÚDOS", "ACTIVIDADES DO PROFESSOR", "ACTIVIDADES DOS ALUNOS", "MÉTODOS DE ENSINO", "MEIOS DE ENSINO"];
                         
                         headers.forEach((header, index) => {
@@ -925,7 +831,6 @@
                             doc.setDrawColor(0, 0, 0);
                             doc.setLineWidth(0.2);
                             doc.rect(xPos, headerY, scaledWidths[index], 12);
-                            
                             const lines = doc.splitTextToSize(header, scaledWidths[index] - 4);
                             let textY = headerY + 4;
                             lines.forEach((line, lineIndex) => {
@@ -937,14 +842,10 @@
                         // Linha 1: Introdução e Motivação
                         const row1Y = headerY + 12;
                         xPos = tableStartX;
-                        
-                        // Coluna TEMPO (vazia)
                         doc.setFillColor(255, 255, 255);
                         doc.rect(xPos, row1Y, scaledWidths[0], 35, 'F');
                         doc.rect(xPos, row1Y, scaledWidths[0], 35);
                         xPos += scaledWidths[0];
-                        
-                        // Coluna FUNÇÕES DIDÁCTICAS (com texto)
                         doc.setFillColor(255, 255, 255);
                         doc.rect(xPos, row1Y, scaledWidths[1], 35, 'F');
                         doc.rect(xPos, row1Y, scaledWidths[1], 35);
@@ -956,8 +857,6 @@
                             funcY1 += 5;
                         });
                         xPos += scaledWidths[1];
-                        
-                        // Outras colunas (vazias)
                         for (let j = 2; j < 7; j++) {
                             doc.setFillColor(255, 255, 255);
                             doc.rect(xPos, row1Y, scaledWidths[j], 35, 'F');
@@ -968,14 +867,10 @@
                         // Linha 2: Mediação e Assimilação
                         const row2Y = row1Y + 35;
                         xPos = tableStartX;
-                        
-                        // Coluna TEMPO (vazia)
                         doc.setFillColor(255, 255, 255);
                         doc.rect(xPos, row2Y, scaledWidths[0], 35, 'F');
                         doc.rect(xPos, row2Y, scaledWidths[0], 35);
                         xPos += scaledWidths[0];
-                        
-                        // Coluna FUNÇÕES DIDÁCTICAS (com texto)
                         doc.setFillColor(255, 255, 255);
                         doc.rect(xPos, row2Y, scaledWidths[1], 35, 'F');
                         doc.rect(xPos, row2Y, scaledWidths[1], 35);
@@ -986,8 +881,6 @@
                             funcY2 += 5;
                         });
                         xPos += scaledWidths[1];
-                        
-                        // Outras colunas (vazias)
                         for (let j = 2; j < 7; j++) {
                             doc.setFillColor(255, 255, 255);
                             doc.rect(xPos, row2Y, scaledWidths[j], 35, 'F');
@@ -996,23 +889,18 @@
                         }
                         
                         // PÁGINA 2 DA AULA
-                        doc.addPage('a4', 'l'); // 'l' para landscape (horizontal)
-                        
-                        // Paginação no canto superior direito
+                        doc.addPage('a4', 'l');
                         doc.setFontSize(9);
                         doc.setFont("times", "normal");
                         doc.text(`Aula ${i} - Página 2/${totalPagesAula}`, 270, 12, { align: "right" });
                         
-                        // Continuar tabela
+                        // Linha 3: Domínio e Consolidação
                         const row3Y = 25;
                         xPos = tableStartX;
-                        
-                        // Linha 3: Domínio e Consolidação
                         doc.setFillColor(255, 255, 255);
                         doc.rect(xPos, row3Y, scaledWidths[0], 35, 'F');
                         doc.rect(xPos, row3Y, scaledWidths[0], 35);
                         xPos += scaledWidths[0];
-                        
                         doc.setFillColor(255, 255, 255);
                         doc.rect(xPos, row3Y, scaledWidths[1], 35, 'F');
                         doc.rect(xPos, row3Y, scaledWidths[1], 35);
@@ -1023,7 +911,6 @@
                             funcY3 += 5;
                         });
                         xPos += scaledWidths[1];
-                        
                         for (let j = 2; j < 7; j++) {
                             doc.setFillColor(255, 255, 255);
                             doc.rect(xPos, row3Y, scaledWidths[j], 35, 'F');
@@ -1034,12 +921,10 @@
                         // Linha 4: Controlo e Avaliação
                         const row4Y = row3Y + 35;
                         xPos = tableStartX;
-                        
                         doc.setFillColor(255, 255, 255);
                         doc.rect(xPos, row4Y, scaledWidths[0], 35, 'F');
                         doc.rect(xPos, row4Y, scaledWidths[0], 35);
                         xPos += scaledWidths[0];
-                        
                         doc.setFillColor(255, 255, 255);
                         doc.rect(xPos, row4Y, scaledWidths[1], 35, 'F');
                         doc.rect(xPos, row4Y, scaledWidths[1], 35);
@@ -1050,7 +935,6 @@
                             funcY4 += 5;
                         });
                         xPos += scaledWidths[1];
-                        
                         for (let j = 2; j < 7; j++) {
                             doc.setFillColor(255, 255, 255);
                             doc.rect(xPos, row4Y, scaledWidths[j], 35, 'F');
@@ -1058,41 +942,29 @@
                             xPos += scaledWidths[j];
                         }
                         
-                        // PÁGINA 3 DA AULA (vertical) - QUADRO MURAL - se foi adicionado
+                        // PÁGINA 3 DA AULA (QUADRO MURAL) - se foi adicionado
                         if (dados.muralAdicionado) {
-                            doc.addPage('a4', 'p'); // 'p' para portrait (vertical)
-                            
-                            // Paginação no canto superior direito
+                            doc.addPage('a4', 'p');
                             doc.setFontSize(9);
                             doc.setFont("times", "normal");
                             doc.text(`Aula ${i} - Página 3/${totalPagesAula}`, 200, 12, { align: "right" });
-                            
-                            // Título
                             doc.setFontSize(16);
                             doc.setFont("times", "bold");
                             doc.text("QUADRO MURAL", 105, 30, { align: "center" });
-                            
-                            // 1. Explicação do tema
                             doc.setFontSize(12);
                             doc.setFont("times", "bold");
                             doc.text("1. Explicação do tema:", 20, 50);
-                            
-                            // Linhas horizontais para escrita (área pautada)
                             let y = 60;
                             for (let j = 0; j < 20; j++) {
                                 doc.line(20, y, 190, y);
                                 y += 7;
                             }
-                            
-                            // 2. Exercícios
                             doc.text("2. Exercícios:", 20, 200);
                             y = 210;
                             for (let j = 0; j < 5; j++) {
                                 doc.line(20, y, 190, y);
                                 y += 7;
                             }
-                            
-                            // 3. TPC
                             doc.text("3. TPC:", 20, 250);
                             y = 260;
                             for (let j = 0; j < 5; j++) {
@@ -1105,7 +977,6 @@
                     pdfDoc = doc;
                     pdfGenerated = true;
                     
-                    // Se a barra de progresso já chegou a 100%, completar a geração
                     if (currentPercentage >= 100) {
                         completeGeneration();
                     }
@@ -1123,7 +994,7 @@
                 }
             }
             
-            // Iniciar contagem regressiva automática após 2 segundos
+            // Iniciar contagem regressiva automática
             setTimeout(function() {
                 startAutoCountdown();
             }, 2000);
