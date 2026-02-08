@@ -166,7 +166,7 @@
             <!-- Passo 2: Inserir código -->
             <div class="payment-step">
                 <h4>2. Insira seu código:</h4>
-                <input type="text" id="codigoInput" class="code-input" placeholder="EX: ABC123" maxlength="20" disabled>
+                <input type="text" id="codigoInput" class="code-input" placeholder="Selecione o pacote primeiro" maxlength="20" disabled>
             </div>
             
             <!-- Botão de validação -->
@@ -182,10 +182,9 @@
             
             <!-- Resultado -->
             <div class="payment-result" id="paymentResult"></div>
-            </div>
-                </p>
-            </div>
-                </p>
+            
+            <div class="test-code-info">
+                <strong>Para teste:</strong> Use o código <strong>123456</strong> (válido para qualquer pacote)
             </div>
         </div>
     </div>
@@ -216,12 +215,7 @@
                 <a href="index.html" class="btn secondary-btn">Criar Novo Bloco</a>
             </div>
             <div class="info-box" style="margin-top: 20px; text-align: center;">
-                <h3>📋 Resumo do Pedido</h3>
-                <p><strong>Total de páginas:</strong> <span id="resumoPaginas">0</span></p>
-                <p><strong>Valor estimado:</strong> <span id="resumoValor">0 MZN</span></p>
-                <p style="color: #666; font-size: 14px; margin-top: 10px;">
-                    <em>Para gerar outro PDF, você precisará de um novo código de acesso.</em>
-                </p>
+                <p><em>Para gerar outro PDF, você precisará de um novo código de acesso.</em></p>
             </div>
         </div>
     </div>
@@ -238,7 +232,8 @@
                 numAulas: parseInt(urlParams.get('numAulas')) || 0,
                 dataGeracao: urlParams.get('dataGeracao') || '',
                 periodo: urlParams.get('periodo') || '',
-                muralAdicionado: urlParams.get('muralAdicionado') === '1'
+                muralAdicionado: urlParams.get('muralAdicionado') === '1',
+                valorTotal: urlParams.get('valorTotal') || 0
             };
             
             if (!dados.escola || !dados.professor || !dados.numAulas) {
@@ -278,8 +273,7 @@
             if (dados.muralAdicionado) totalPaginas += dados.numAulas;
             totalPaginas += 2;
             
-            let valorBase = Math.ceil(dados.numAulas / 10) * 50;
-            if (dados.muralAdicionado) valorBase += dados.numAulas * 5;
+            let valorBase = dados.valorTotal;
             
             infoContainer.innerHTML = `
                 <h3>📋 Dados do Bloco</h3>
@@ -375,6 +369,7 @@
                     
                     // Habilitar input de código
                     codigoInput.disabled = false;
+                    codigoInput.placeholder = "EX: ABC123";
                     codigoInput.focus();
                     
                     // Habilitar botão de validação
@@ -397,6 +392,7 @@
                         selectedAula = pacote;
                         selectedAulaPacote = pacote;
                         codigoInput.disabled = false;
+                        codigoInput.placeholder = "EX: ABC123";
                         validarBtn.disabled = false;
                     }
                 });
@@ -466,11 +462,11 @@
                 const userAgent = navigator.userAgent;
                 
                 try {
-                    // SEU LINK DO GOOGLE APPS SCRIPT AQUI
-                    const SEU_LINK = 'https://script.google.com/macros/s/AKfycbz4Y3-feOV4VHowO4rPdy7B-hoSKWiDtZvj9PoGLEjV7gZ77gFU3-nRbSVli-wxYHpz/exec';
+                    // NOVO LINK DO GOOGLE APPS SCRIPT
+                    const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyp3DYFfRNt9mcC8sU1hG6cXa5lll0End82ABA1pRDL-lCRWhNdWDmpC1y5Cwee09kx/exec';
                     
                     // Fazer chamada para o Google Apps Script
-                    const url = SEU_LINK + '?tipoAula=' + encodeURIComponent(selectedAula) + '&codigo=' + encodeURIComponent(codigo) + '&userAgent=' + encodeURIComponent(userAgent);
+                    const url = GOOGLE_APPS_SCRIPT_URL + '?tipoAula=' + encodeURIComponent(selectedAula) + '&codigo=' + encodeURIComponent(codigo) + '&userAgent=' + encodeURIComponent(userAgent);
                     
                     const response = await fetch(url);
                     const resultado = await response.json();
@@ -995,6 +991,24 @@
                             doc.rect(xPos, row4Y, scaledWidths[j], 35, 'F');
                             doc.rect(xPos, row4Y, scaledWidths[j], 35);
                             xPos += scaledWidths[j];
+                        }
+                        
+                        // Se mural não foi adicionado, adicionar "Quadro Mural" na página 2
+                        if (!dados.muralAdicionado) {
+                            let yPosMural = row4Y + 45;
+                            doc.setFont("times", "bold");
+                            doc.setFontSize(14);
+                            doc.text("QUADRO MURAL", 148, yPosMural, { align: "center" });
+                            yPosMural += 8;
+                            doc.setFont("times", "normal");
+                            doc.setFontSize(10);
+                            doc.text("Espaço reservado para anotações do quadro", 148, yPosMural, { align: "center" });
+                            
+                            yPosMural += 10;
+                            for (let j = 0; j < 8; j++) {
+                                doc.line(30, yPosMural, 267, yPosMural);
+                                yPosMural += 8;
+                            }
                         }
                         
                         // PÁGINA 3 DA AULA (QUADRO MURAL) - se foi adicionado

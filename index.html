@@ -268,7 +268,7 @@
                     <div class="form-group">
                         <label for="periodo">Período</label>
                         <select id="periodo">
-                            <option value="">Selecione</option>
+                            <option value="">Selecione (opcional)</option>
                             <option value="Manhã">Manhã</option>
                             <option value="Tarde">Tarde</option>
                             <option value="Noite">Noite</option>
@@ -339,7 +339,7 @@
 
             // Variável para controlar se o mural foi adicionado
             let muralAdicionado = false;
-            const precoMural = 5; // 5 MZN por bloco
+            const precoMural = 5; // 5 MZN por aula
 
             // Ir para etapa 2
             function goToStep2() {
@@ -366,7 +366,7 @@
             // Evento do botão do mural
             if (muralBtn) {
                 muralBtn.addEventListener('click', function () {
-                    if (confirm('Tem a certeza que pretende adicionar 1 página de Quadro Mural por aula?\n\nIsso irá adicionar uma página vertical adicional a cada aula e acrescentará 5 MZN ao valor total.')) {
+                    if (confirm('Tem a certeza que pretende adicionar 1 página de Quadro Mural por aula?\n\nIsso irá adicionar uma página vertical adicional a cada aula e acrescentará 5 MZN por aula ao valor total.')) {
                         muralAdicionado = true;
                         this.classList.remove('btn-outline');
                         this.classList.add('btn-mural-added');
@@ -384,20 +384,20 @@
             function updatePrice() {
                 const numAulas = parseInt(numAulasSelect.value);
                 if (numAulas) {
-                    const precoPor10 = 12; // preço base por 10 aulas
-                    let total = (numAulas / 10) * precoPor10;
+                    // Calcular valor base: cada 10 aulas = 50 MZN
+                    let total = Math.ceil(numAulas / 10) * 12;
                     
-                    // Adicionar 5 MZN se o mural foi adicionado
+                    // Adicionar 5 MZN por aula se o mural foi adicionado
                     if (muralAdicionado) {
-                        total += precoMural;
-                        muralInfo.textContent = `Inclui ${numAulas} páginas de Quadro Mural`;
+                        total += numAulas * 5;
+                        muralInfo.textContent = `Inclui ${numAulas} páginas de Quadro Mural (+5 MZN por aula)`;
                         muralInfo.style.display = 'block';
                     } else {
                         muralInfo.textContent = '';
                         muralInfo.style.display = 'none';
                     }
                     
-                    priceValue.textContent = total.toFixed(2) + ' MZN';
+                    priceValue.textContent = total + ' MZN';
                     priceInfo.style.display = 'block';
                 } else {
                     priceInfo.style.display = 'none';
@@ -414,16 +414,27 @@
 
             // Coletar dados
             function getFormData() {
+                const numAulas = document.getElementById('numAulas')?.value || '';
+                let total = 0;
+                
+                if (numAulas) {
+                    total = Math.ceil(numAulas / 10) + 5;
+                    if (muralAdicionado) {
+                        total += parseInt(numAulas) * 5;
+                    }
+                }
+                
                 return {
                     escola: document.getElementById('escola')?.value?.trim() || '',
                     professor: document.getElementById('professor')?.value?.trim() || '',
                     disciplina: document.getElementById('disciplina')?.value?.trim() || '',
                     classe: document.getElementById('classe')?.value?.trim() || '',
                     anoLectivo: document.getElementById('anoLectivo')?.value?.trim() || '',
-                    numAulas: document.getElementById('numAulas')?.value || '',
+                    numAulas: numAulas,
                     periodo: document.getElementById('periodo')?.value || '',
                     dataGeracao: document.getElementById('dataGeracao')?.value || '',
-                    muralAdicionado: muralAdicionado ? '1' : '0'
+                    muralAdicionado: muralAdicionado ? '1' : '0',
+                    valorTotal: total // Adicionando o valor total
                 };
             }
 
