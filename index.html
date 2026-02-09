@@ -399,8 +399,10 @@
                     
                     priceValue.textContent = total + ' MZN';
                     priceInfo.style.display = 'block';
+                    return total; // Retornar o valor calculado
                 } else {
                     priceInfo.style.display = 'none';
+                    return 0;
                 }
             }
 
@@ -415,14 +417,7 @@
             // Coletar dados
             function getFormData() {
                 const numAulas = document.getElementById('numAulas')?.value || '';
-                let total = 0;
-                
-                if (numAulas) {
-                    total = Math.ceil(numAulas / 10) + 5;
-                    if (muralAdicionado) {
-                        total += parseInt(numAulas) * 5;
-                    }
-                }
+                const valorTotal = updatePrice(); // Usar a função updatePrice para obter o valor correto
                 
                 return {
                     escola: document.getElementById('escola')?.value?.trim() || '',
@@ -434,7 +429,7 @@
                     periodo: document.getElementById('periodo')?.value || '',
                     dataGeracao: document.getElementById('dataGeracao')?.value || '',
                     muralAdicionado: muralAdicionado ? '1' : '0',
-                    valorTotal: total // Adicionando o valor total
+                    valorTotal: valorTotal // Adicionando o valor total calculado
                 };
             }
 
@@ -465,7 +460,7 @@
                 }
             });
 
-            // Pré-visualizar
+            // Pré-visualizar - Abrir link do Google Drive
             const generateBtn = document.getElementById('generateBtn');
             if (generateBtn) {
                 generateBtn.addEventListener('click', function (e) {
@@ -475,8 +470,8 @@
                         alert('Preencha todos os campos obrigatórios antes de pré-visualizar.');
                         return;
                     }
-                    const params = new URLSearchParams(data).toString();
-                    window.open(`preview.html?${params}`, '_blank');
+                    // Abrir o link do Google Drive em nova aba
+                    window.open('https://drive.google.com/file/d/12RJVugadoiDJoS3N51YOirYndAvw2pr9/view?usp=drivesdk', '_blank');
                 });
             }
 
